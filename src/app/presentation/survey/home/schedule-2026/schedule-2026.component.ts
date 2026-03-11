@@ -118,8 +118,7 @@ export class Schedule2026Component {
       enableDates = JSON.parse(saveStageEnable);
     }
     console.log('enableDates 2026:', enableDates);
-    const shouldForceStageRange = enableDates.length === 0;
-    const forcedEnabledStages = new Set([1, 2, 3, 4]);
+    const shouldForceStageOne = enableDates.length === 0;
     let stages = stagesData.map((stage: any) => {
 
       const found = enableDates.find((e: any) => e.stage == stage.stage +5);
@@ -132,8 +131,9 @@ export class Schedule2026Component {
       }
       return {
         ...stage,
-        //habilitar los stage del 1 al 4 si no hay fechas guardadas, de lo contrario mantener deshabilitados hasta que se habiliten manualmente
-        enable: shouldForceStageRange ? forcedEnabledStages.has(stage.stage) : false
+        //habilitar los stage del 1 al 5 si no hay fechas guardadas, de lo contrario mantener deshabilitados hasta que se habiliten manualmente
+
+        enable: shouldForceStageOne ? stage.stage === 1 : false
       };
     });
     this.stages = Array.from(stages);
