@@ -111,7 +111,7 @@ export class ScheduleComponent {
     if (saveStageEnable) {
       enableDates = JSON.parse(saveStageEnable);
     }
-        console.log('enableDates:', enableDates);
+    //console.log('enableDates:', enableDates);
     let stages = stagesData.map((stage: any) => {
 
       const found = enableDates.find((e: any) => e.stage == stage.stage);

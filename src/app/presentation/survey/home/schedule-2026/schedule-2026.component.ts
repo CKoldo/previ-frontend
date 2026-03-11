@@ -127,7 +127,7 @@ export class Schedule2026Component {
     if (saveStageEnable) {
       enableDatesArr = JSON.parse(saveStageEnable);
     }
-    console.log('enableDatesArr', enableDatesArr);
+    //console.log('enableDatesArr', enableDatesArr);
     // Asignar fechas a cada stage
     stagesData = stagesData.map((stage: any) => {
       const found = enableDatesArr.find((e: any) => e.stage == stage.stage + 5);
