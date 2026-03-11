@@ -10,7 +10,10 @@
           <p class="text-black font-semibold font-sans tracking-wide text-lg items-center justify-center flex gap-1">
             {{ stage.labelStage }}
           </p>
-          <div class="w-16 bg-gray-200 rounded-full h-1">
+          <p class="text-sm text-gray-500">
+            {{ formatDate(enableDates?.start) }} - {{formatDate(enableDates?.end)}}
+          </p>
+          <div class="w-full bg-gray-200 rounded-full h-1">
             <div class="bg-transparent h-1 rounded-full" [style]="getProgressBarStyle(stage)"></div>
           </div>
         </div>
@@ -27,15 +30,13 @@
             [ngClass]="{
               'bg-green-50! text-green-500! border-l-green-500! border-green-100!':
                 survey.complete,
-              'mb-4': stage.survey[stage.survey.length - 1] === survey
-            }" (click)="
-            selectStage(survey.survey, survey.countQuestion)
-            " *ngIf="stage.enable && survey.enable">
+              'mb-4': stage.survey[stage.survey.length - 1] === survey,
+            }" (click)="selectStage(survey.survey, survey.countQuestion)" *ngIf="stage.enable && survey.enable">
             <div class="flex flex-col">
               <span class="block text-sm font-bold">
                 <i class="pi text-sm mt-0.5 mr-1" [ngClass]="{
                     'pi-bookmark': !survey.complete,
-                    'pi-bookmark-fill': survey.complete
+                    'pi-bookmark-fill': survey.complete,
                   }"></i>{{ survey.label }}</span>
               <!-- <span class="text-xs" *ngIf="survey?.extraInfo">{{
                 survey?.extraInfo
@@ -44,30 +45,30 @@
             <i class="pi pi-check" *ngIf="survey.complete"></i>
           </div>
           <div
-            class="flex justify-between items-center bg-gray-100! text-gray-500! rounded px-3 py-6 mt-3 border-l-blue-500  transition duration-300 ease-in-out border h-20 hover:shadow-none! cursor-not-allowed! border-gray-200! border-l-1!"
+            class="flex justify-between items-center bg-gray-100! text-gray-500! rounded px-3 py-6 mt-3 border-l-blue-500 transition duration-300 ease-in-out border h-20 hover:shadow-none! cursor-not-allowed! border-gray-200! border-l-1!"
             [ngClass]="{
-              'mb-4': stage.survey[stage.survey.length - 1] === survey
+              'mb-4': stage.survey[stage.survey.length - 1] === survey,
             }" *ngIf="stage.enable && !survey.enable">
             <div class="flex flex-col">
               <span class="block text-sm font-bold">
                 <i class="pi text-sm mt-0.5 mr-1" [ngClass]="{
                     'pi-bookmark': !survey.complete,
-                    'pi-bookmark-fill': survey.complete
+                    'pi-bookmark-fill': survey.complete,
                   }"></i>{{ survey.label }}</span>
               <span class="text-xs text-gray-500">Se habilitará próximamente</span>
             </div>
             <i class="pi pi-lock"></i>
           </div>
           <div
-            class="flex justify-between items-center bg-gray-100! text-gray-500! rounded px-3 py-6 mt-3 border-l-blue-500  transition duration-300 ease-in-out border h-20 hover:shadow-none! cursor-not-allowed! border-gray-200! border-l-1!"
+            class="flex justify-between items-center bg-gray-100! text-gray-500! rounded px-3 py-6 mt-3 border-l-blue-500 transition duration-300 ease-in-out border h-20 hover:shadow-none! cursor-not-allowed! border-gray-200! border-l-1!"
             [ngClass]="{
-              'mb-4': stage.survey[stage.survey.length - 1] === survey
+              'mb-4': stage.survey[stage.survey.length - 1] === survey,
             }" *ngIf="!stage.enable">
             <div class="flex flex-col">
               <span class="block text-sm font-bold">
                 <i class="pi text-sm mt-0.5 mr-1" [ngClass]="{
                     'pi-bookmark': !survey.complete,
-                    'pi-bookmark-fill': survey.complete
+                    'pi-bookmark-fill': survey.complete,
                   }"></i>{{ survey.label }}</span>
               <span class="text-xs" *ngIf="survey?.extraInfo">{{
                 survey?.extraInfo
