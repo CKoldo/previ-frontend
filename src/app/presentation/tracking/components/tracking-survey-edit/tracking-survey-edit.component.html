@@ -1,0 +1,125 @@
+<div class="tracking-edit__container" *ngIf="hasContext; else missingContext">
+  <section class="tracking-edit__card">
+    <p class="tracking-edit__eyebrow">Edición administrativa</p>
+    <h1 class="tracking-edit__title">{{ institutionName }}</h1>
+    <p class="tracking-edit__subtitle">
+      Estás editando {{ taskLabel }} del código local
+      {{ taskContext?.ie?.CODIGO_LOCAL }} del año {{ taskContext?.year }}.
+    </p>
+
+    <div class="tracking-edit__meta">
+      <div>
+        <small>Código local</small>
+        <p>{{ taskContext?.ie?.CODIGO_LOCAL }}</p>
+      </div>
+      <div>
+        <small>Documento</small>
+        <p>
+          {{
+            taskContext?.ie?.NUMERO_DOCUMENTO_IE ||
+              taskContext?.ie?.NUMERO_DOCUMENTO ||
+              taskContext?.ie?.NUM_DOC ||
+              taskContext?.ie?.DNI_DIRECTOR ||
+              "—"
+          }}
+        </p>
+      </div>
+      <div>
+        <small>UGEL</small>
+        <p>{{ taskContext?.ie?.UGEL || taskContext?.ie?.DRE || "—" }}</p>
+      </div>
+    </div>
+
+    <div class="tracking-edit__actions">
+      <button type="button" class="btn ghost" (click)="goBack()">
+        Volver al tracking
+      </button>
+      <button
+        type="button"
+        class="btn primary"
+        (click)="retryPreparation()"
+        [disabled]="isPreparing"
+      >
+        {{ isPreparing ? "Preparando..." : "Reintentar carga" }}
+      </button>
+    </div>
+
+    <p class="tracking-edit__hint">
+      Los cambios se guardarán directamente sobre el registro de la institución.
+    </p>
+
+    <p class="tracking-edit__error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+
+  <section class="tracking-edit__layout" *ngIf="showSurvey">
+    <div class="info-panel">
+      <h2>Información de implementación</h2>
+      <app-information-implementation
+        [selectedStage]="selectedStage ?? 1"
+        [selectedPhase]="selectedPhase ?? 1"
+        [isAllStagesCompleted]="false"
+      ></app-information-implementation>
+      <!--	
+      <div class="info-panel__details" *ngIf="taskContext?.taskInfo">
+        <div class="detail-row">
+          <span>Última actualización</span>
+          <strong>{{
+            taskContext?.taskInfo?.FECHA_ACTUALIZACION || "Sin registro"
+          }}</strong>
+        </div>
+        <div class="detail-row">
+          <span>Responsable</span>
+          <strong>{{
+            taskContext?.taskInfo?.USUARIO || "No identificado"
+          }}</strong>
+        </div>
+        <div class="detail-row">
+          <span>Observación</span>
+          <strong>{{ taskContext?.taskInfo?.OBSERVACION || "—" }}</strong>
+        </div>
+      </div>
+	-->
+    </div>
+
+    <div class="stage-panel">
+      <div class="stage-panel__header">
+        <div>
+          <p class="stage-panel__eyebrow">Tarea seleccionada</p>
+          <h3>Fase {{ selectedStage }} · Tarea {{ selectedPhase }}</h3>
+        </div>
+      </div>
+
+      <ng-container
+        *ngIf="stageComponentToRender as component; else stageFallback"
+      >
+        <ng-container
+          *ngComponentOutlet="
+            component;
+            inputs: stageInputs;
+            outputs: stageOutputs
+          "
+        ></ng-container>
+      </ng-container>
+      <ng-template #stageFallback>
+        <div class="stage-panel__loading">
+          <span class="spinner"></span>
+          <p>No se pudo cargar la fase seleccionada.</p>
+        </div>
+      </ng-template>
+
+      <div class="stage-panel__loading" *ngIf="childLoading">
+        <span class="spinner"></span>
+        <p>Cargando preguntas guardadas...</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<ng-template #missingContext>
+  <div class="empty-state">
+    <p>No se encontró ninguna tarea seleccionada.</p>
+    <button type="button" class="btn primary" (click)="goBack()">
+      Volver al seguimiento
+    </button>
+  </div>
+</ng-template>

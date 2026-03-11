@@ -1,0 +1,20 @@
+<!--<div
+  class="w-full bg-gradient-to-b from-gray-900 via-gray-900 min-h-screen transition ease-in duration-500 bg-blue-900 to-blue-800">
+  <app-header />
+  <router-outlet />
+  <app-footer />
+</div>
+-->
+
+<div
+  class="w-full min-h-screen flex flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-blue-800 transition ease-in duration-500">
+
+  <app-header />
+
+  <main class="flex-1">
+    <router-outlet />
+  </main>
+
+  <app-footer />
+
+</div>

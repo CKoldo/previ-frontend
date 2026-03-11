@@ -1,0 +1,67 @@
+<div class="flex gap-4 justify-between">
+
+    <div class="w-full">
+      <div class="bg-white px-4 rounded-lg shadow-md">
+        <div class="overflow-x-auto">
+          <table
+            class="w-full whitespace-nowrap table-auto border-separate border-spacing-y-4 border-gray-100"
+          >
+            <tbody class="">
+              <tr
+                class="focus:outline-none h-16 border border-gray-100 rounded-lg my-4 items-center w-full  focus:text-white  text-black transition"
+                [ngClass]="{'hover:bg-blue-500 focus:bg-blue-500 hover:text-white': !isCompletePhase}"
+                *ngFor="let docente of docentes"
+              >
+                <td
+                  colspan="3"
+                  class="border-y border-gray-200 border-l rounded-l-lg"
+                >
+                  <div class="flex items-center pl-5">
+                    <p class="text-sm font-normal leading-none mr-2">
+                      {{ docente.label }}
+                    </p>
+                  </div>
+                </td>
+                <td
+                  colspan="2"
+                  class="border-y border-gray-200 border-r rounded-r-lg"
+                >
+                  <div class="flex items-center justify-end pr-5">
+                    <p-inputnumber
+                      class="rounded-md p-2"
+                      [(ngModel)]="docente.cantidad"
+                      maxlength="3"
+                      [useGrouping]="false"
+                      [inputStyle]="{ width: '100px' }"
+                      [disabled]="isCompletePhase && !isUpdateEnable"
+                    />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot class="">
+              <tr
+                class="bg-blue-500 font-semibold text-white focus:outline-none h-16 rounded my-4 mb-0 items-center w-full"
+              >
+                <td
+                  colspan="3"
+                  class="px-4 py-3 text-left tracking-wider border-t border-gray-200"
+                >
+                  <div class="flex items-center">
+                    <p class="text-base font-medium leading-none mr-2">Total</p>
+                  </div>
+                </td>
+                <td
+                  colspan="2"
+                  class="px-6 pr-16 py-3 text-right tracking-wider font-semibold border-t border-gray-200 text-lg"
+                >
+                  {{ getTotalDocentes() }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+</div>

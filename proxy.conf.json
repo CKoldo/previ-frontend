@@ -1,0 +1,9 @@
+{
+  "/api": {
+    //cambiar segun el backend
+    "target": "https://locking-contain-distances-vbulletin.trycloudflare.com/",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  }
+}

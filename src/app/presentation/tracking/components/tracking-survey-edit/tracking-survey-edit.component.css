@@ -1,0 +1,221 @@
+.tracking-edit__container {
+	min-height: 100vh;
+	padding: 2.5rem 3rem 3rem;
+	background: linear-gradient(135deg, #f6f7ff 0%, #eef2ff 100%);
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.tracking-edit__card {
+	background: #fff;
+	border-radius: 1rem;
+	padding: 2rem;
+	box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.tracking-edit__eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	font-size: 0.75rem;
+	color: #6366f1;
+	font-weight: 600;
+	margin-bottom: 0.25rem;
+}
+
+.tracking-edit__title {
+	font-size: 2rem;
+	margin: 0;
+	color: #0f172a;
+}
+
+.tracking-edit__subtitle {
+	color: #475569;
+	margin: 0;
+}
+
+.tracking-edit__meta {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 1rem;
+}
+
+.tracking-edit__meta small {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 0.75rem;
+	color: #94a3b8;
+}
+
+.tracking-edit__meta p {
+	margin: 0.25rem 0 0;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.tracking-edit__actions {
+	display: flex;
+	gap: 1rem;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
+.tracking-edit__hint {
+	font-size: 0.9rem;
+	color: #475569;
+	margin: 0;
+}
+
+.tracking-edit__error {
+	color: #dc2626;
+	font-weight: 600;
+}
+
+.tracking-edit__layout {
+	display: grid;
+	grid-template-columns: minmax(320px, 420px) 1fr;
+	gap: 2rem;
+}
+
+.info-panel,
+.stage-panel {
+	background: #fff;
+	border-radius: 1rem;
+	padding: 1.5rem;
+	box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+	position: relative;
+}
+
+.info-panel h2 {
+	margin-top: 0;
+	color: #0f172a;
+}
+
+.info-panel__details {
+	margin-top: 1.5rem;
+}
+
+.detail-row {
+	display: flex;
+	justify-content: space-between;
+	border-bottom: 1px solid #e2e8f0;
+	padding: 0.5rem 0;
+	font-size: 0.95rem;
+}
+
+.detail-row span {
+	color: #64748b;
+}
+
+.detail-row strong {
+	color: #0f172a;
+}
+
+.stage-panel__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+}
+
+.stage-panel__eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.75rem;
+	color: #6366f1;
+	margin: 0 0 0.25rem;
+}
+
+.stage-panel__loading {
+	position: absolute;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.85);
+	border-radius: 1rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0.75rem;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.btn {
+	border: none;
+	border-radius: 999px;
+	padding: 0.85rem 1.75rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.primary {
+	background: #4f46e5;
+	color: #fff;
+	box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+}
+
+.btn.primary:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	box-shadow: none;
+}
+
+.btn.ghost {
+	background: transparent;
+	color: #475569;
+	border: 1px solid #cbd5f5;
+}
+
+.btn:not(:disabled):hover {
+	transform: translateY(-1px);
+}
+
+.empty-state {
+	max-width: 600px;
+	margin: 4rem auto;
+	text-align: center;
+	padding: 2rem;
+	background: #fff;
+	border-radius: 16px;
+	box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1);
+}
+
+.empty-state p {
+	margin-bottom: 1.25rem;
+}
+
+.spinner {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: 3px solid #e0e7ff;
+	border-top-color: #4f46e5;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (max-width: 1024px) {
+	.tracking-edit__layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 640px) {
+	.tracking-edit__container {
+		padding: 1.5rem;
+	}
+
+	.tracking-edit__actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}

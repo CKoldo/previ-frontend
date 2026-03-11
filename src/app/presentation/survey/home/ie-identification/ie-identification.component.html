@@ -1,0 +1,54 @@
+  <h3 class="text-xl text-slate-900 font-semibold mb-4 mt-0">
+    Datos de identificación de la IE
+  </h3>
+  <form class="mb-4 grid grid-cols-4 gap-4 p-4 rounded-lg bg-white shadow-md" [formGroup]="formGroup">
+    <div class="col-span-4">
+      <label for="dre" class="block text-sm font-medium text-gray-700"
+        >DRE</label
+      >
+      <input
+      pInputText
+      type="text"
+      formControlName="dre"
+      class="mt-1 block w-full p-2 border border-gray-300 rounded-md pointer-events-none"
+    />
+    </div>
+    <div class="col-span-4">
+      <label for="ugel" class="block text-sm font-medium text-gray-700"
+        >UGEL</label
+      >
+      <input
+      pInputText
+      type="text"
+      formControlName="ugel"
+      class="mt-1 block w-full p-2 border border-gray-300 rounded-md pointer-events-none"
+    />
+    </div>
+    <div class="col-start-1 col-end-3">
+      <label
+        for="institutionCode"
+        class="block text-sm font-medium text-gray-700"
+        >Código Local IE</label
+      >
+      <input
+        pInputText
+        type="text"
+        formControlName="institutionCode"
+        class="mt-1 block w-full p-2 border border-gray-300 rounded-md pointer-events-none"
+      />
+    </div>
+    <div class="col-span-4">
+      <label for="institutionName" class="block text-sm font-medium text-gray-700"
+        >Nombre de la IE</label
+      >
+      <input
+        pInputText
+        type="text"
+        formControlName="institutionName"
+        class="mt-1 block w-full p-2 border border-gray-300 rounded-md pointer-events-none"
+      />
+    </div>
+  </form>
+
+
+

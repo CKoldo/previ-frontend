@@ -1,0 +1,36 @@
+<div class="flex gap-4 w-full justify-between items-center mt-4">
+<div>
+  <button
+  (click)="GoToSelectStage()"
+  class="bg-blue-500 text-white p-2 w-60 cursor-pointer text-md transition ease-in duration-300 rounded-xl"
+>
+  Volver a seleccionar tarea
+</button>
+</div>
+
+  <div class="flex gap-4">
+  <button
+    (click)="currentStep > 1 ? previousStep():null"
+    class="bg-blue-500 text-white p-2 w-60 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
+    [disabled]="currentStep == 1||!tareaImplementada"
+    [ngClass]="{'bg-gray-500 cursor-not-allowed!': (currentStep == 1||!tareaImplementada)}"
+    *ngIf="tareaImplementada"
+  >
+    Anterior
+  </button>
+  <button
+    *ngIf="currentStep == 1 || currentStep < countQuestion"
+    (click)="nextStep()"
+    class="bg-blue-500 text-white p-2 w-60 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
+  >
+    Siguiente
+  </button>
+  <button
+    *ngIf="currentStep === countQuestion"
+    (click)="finalStep()"
+    class="bg-green-500 text-white p-2 w-60 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
+  >
+    {{isCompletePhase && isUpdateEnable?"Continuar":"Finalizar"}}
+  </button>
+</div>
+</div>

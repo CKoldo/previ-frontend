@@ -1,0 +1,178 @@
+<div class="w-full px-5 flex justify-center">
+  <p-table
+    #dt1
+    [value]="arrayTabla"
+    class="w-full text-sm"
+    [paginator]="true"
+    [scrollable]="true"
+    scrollHeight="800px"
+    loadingIcon="pi pi-spin pi-spinner"
+    [loading]="isLoading"
+    [rows]="20"
+    [rowsPerPageOptions]="[20, 50, 100]"
+    paginatorDropdownAppendTo="body"
+    [first]="0"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [globalFilterFields]="[
+      'CODIGO_LOCAL',
+      'NUMERO_DOCUMENTO_IE',
+      'NUMERO_DOCUMENTO_DRE',
+      'NUMERO_DOCUMENTO_UGEL',
+    ]"
+  >
+    <!-- BUSCADOR GLOBAL -->
+    <ng-template pTemplate="caption">
+      <div class="survey-edit__actions">
+        <div>
+        <button type="button" class="btn ghost" (click)="goBack()">
+          Regresar Home
+        </button>
+        </div>
+        <div>
+        <i class="pi pi-search mx-5 mt-5" style="text-align: right;"> </i>
+        <input
+          type="text"
+          pInputText
+          size="50"
+          placeholder="Buscador global"
+          (input)="dt1.filterGlobal(cleanVal($event), 'contains')"
+          style="width: auto"
+        />
+        </div>
+      </div>
+
+    </ng-template>
+    <!-- CABECERA DE LA TABLA -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="border border-gray-300 px-4 py-2">
+          <div class="w-full text-center">CÓDIGO LOCAL</div>
+        </th>
+        <th class="border border-gray-300 px-4 py-2">
+          <div class="w-full text-center">NÚMERO DOCUMENTO IE</div>
+        </th>
+        <th class="border border-gray-300 px-4 py-2">
+          <div class="w-full text-center">NÚMERO DOCUMENTO DRE</div>
+        </th>
+        <th class="border border-gray-300 px-4 py-2">
+          <div class="w-full text-center">NÚMERO DOCUMENTO UGEL</div>
+        </th>
+        <th class="border border-gray-300 px-4 py-2">
+          <div class="w-full text-center">OPERACIÓN</div>
+        </th>
+      </tr>
+    </ng-template>
+    <!-- CUERPO DE LA TABLA -->
+    <ng-template pTemplate="body" let-ie>
+      <tr
+        class="odd:bg-white even:bg-gray-50 hover:bg-gray-300"
+        [ngClass]="{ 'bg-blue-100!': detectSelect(ie) }"
+      >
+        <!-- <td class="border border-gray-300 px-4 py-2 font-medium " pFrozenColumn *ngIf="!esUGEL"><div class="w-[250px]" >{{ ie.DRE }}</div></td> -->
+        <td class="border border-gray-300 px-4 py-2 font-medium">
+          <div class="w-full">{{ ie.CODIGO_LOCAL }}</div>
+        </td>
+        <td class="border border-gray-300 px-4 py-2 font-medium">
+          <div class="w-full">{{ ie.NUMERO_DOCUMENTO_IE }}</div>
+        </td>
+        <td class="border border-gray-300 px-4 py-2 font-medium">
+          <div class="w-full">{{ ie.NUMERO_DOCUMENTO_DRE }}</div>
+        </td>
+        <td class="border border-gray-300 px-4 py-2 font-medium">
+          <div class="w-full">{{ ie.NUMERO_DOCUMENTO_UGEL }}</div>
+        </td>
+        <td class="border border-gray-300 px-4 py-2 font-medium">
+          <div class="w-full text-center">
+            <span class="pi pi-user-edit" (click)="showDialog(ie)"></span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <!-- MENSAJE CUANDO NO HAY REGISTROS -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="border border-gray-300 px-4 py-2 font-medium">
+          No hay registros
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<!-- DIALOG ACTUALIZAR USUARIOS VENTANA EMERGENTE -->
+<p-dialog
+  [(visible)]="userDialog"
+  [style]="{ width: '400px' }"
+  header="Actualización de credenciales"
+  [modal]="true"
+  [autoZIndex]="false"
+  [baseZIndex]="10000"
+  [closeOnEscape]="false"
+  [closable]="false"
+  [dismissableMask]="true"
+  [resizable]="false"
+  [draggable]="false"
+  [focusOnShow]="false"
+  [showHeader]="true"
+  [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto' }"
+>
+  <!-- CONTENIDO DEL DIALOG -->
+  <ng-template #content>
+    <div class="flex flex-col gap-6">
+      <div>
+        <label for="name" class="block font-bold mb-3">Código Local</label>
+        <input
+          type="text"
+          pInputText
+          id="name"
+          [(ngModel)]="selectUser.CODIGO_LOCAL"
+          disabled
+        />
+      </div>
+      <div>
+        <label for="name" class="block font-bold mb-3"
+          >Número documento IE</label
+        >
+        <input
+          type="text"
+          pInputText
+          id="name"
+          class="w-full"
+          [(ngModel)]="selectUser.NUMERO_DOCUMENTO_IE"
+          maxlength="8"
+        />
+      </div>
+      <div>
+        <label for="name" class="block font-bold mb-3"
+          >Número documento DRE</label
+        >
+        <input
+          type="text"
+          pInputText
+          id="name"
+          class="w-full"
+          [(ngModel)]="selectUser.NUMERO_DOCUMENTO_DRE"
+          maxlength="8"
+        />
+      </div>
+      <div>
+        <label for="name" class="block font-bold mb-3"
+          >Número documento UGEL</label
+        >
+        <input
+          type="text"
+          pInputText
+          id="name"
+          class="w-full"
+          [(ngModel)]="selectUser.NUMERO_DOCUMENTO_UGEL"
+          maxlength="8"
+        />
+      </div>
+    </div>
+  </ng-template>
+  <!-- FOOTER DEL DIALOG -->
+  <ng-template #footer class="mt-4">
+    <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+    <p-button label="Guardar" icon="pi pi-check" (click)="saveUser()" />
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,138 @@
+<div class="survey-edit__container">
+  <section class="survey-edit__card">
+    <div>
+      <p class="survey-edit__eyebrow">Edición administrativa</p>
+      <h1 class="survey-edit__title">Editar registro PREVI</h1>
+      <p class="survey-edit__subtitle">
+        Selecciona el código local, documento y la fase/tarea para cargar las
+        respuestas guardadas.
+      </p>
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="loadSurvey()"
+      class="survey-edit__form"
+    >
+      <label class="survey-edit__field">
+        <span>Código local</span>
+        <!--
+        <input
+          type="text"
+          formControlName="codigoLocal"
+          placeholder="Ej. 123456"
+          [class.is-invalid]="
+            controls.codigoLocal.touched && controls.codigoLocal.invalid
+                      [class.is-invalid]="
+            controls.numeroDocumento.touched && controls.numeroDocumento.invalid
+          "
+          "
+        />-->
+        <input
+          type="text"
+          formControlName="codigoLocal"
+          placeholder="Ej. 123456"
+        />
+      </label>
+      <label class="survey-edit__field">
+        <span>Número de documento</span>
+        <input
+          type="text"
+          formControlName="numeroDocumento"
+          placeholder="Documento del responsable"
+        />
+      </label>
+      <label class="survey-edit__field">
+        <span>Fase</span>
+        <select formControlName="stage">
+          <option [ngValue]="null" disabled>Selecciona una fase</option>
+          <option *ngFor="let option of stageOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+      <label class="survey-edit__field">
+        <span>Tarea</span>
+        <select formControlName="task">
+          <option [ngValue]="null" disabled>Selecciona una tarea</option>
+          <option *ngFor="let option of taskOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+      <label class="survey-edit__field">
+        <span>Year</span>
+        <select formControlName="year">
+          <option [ngValue]="null" disabled>Selecciona un año</option>
+          <option *ngFor="let option of yearOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+      <div class="survey-edit__actions">
+        <button type="button" class="btn ghost" (click)="goBack()">
+          Regresar Home
+        </button>
+        <button type="button" class="btn ghost" (click)="clearSelection()">
+          Limpiar
+        </button>
+        <button type="submit" class="btn primary" [disabled]="isRecordLoading">
+          {{ isRecordLoading ? "Buscando..." : "Cargar registro" }}
+        </button>
+      </div>
+    </form>
+
+    <p class="survey-edit__hint">
+      Los cambios se guardarán sobre la misma fila de la tabla
+      <strong>registro_previ</strong>.
+    </p>
+    <p class="survey-edit__error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+
+  <section class="survey-edit__layout" *ngIf="showSurvey">
+    <div class="info-panel">
+      <h2>Información de implementación</h2>
+      <app-information-implementation
+        [selectedStage]="selectedStage ?? 1"
+        [selectedPhase]="selectedPhase ?? 1"
+        [isAllStagesCompleted]="false"
+      ></app-information-implementation>
+    </div>
+    <div class="stage-panel">
+      <div class="stage-panel__header">
+        <div>
+          <p class="stage-panel__eyebrow">Tarea seleccionada</p>
+          <h3>Fase {{ selectedStage }} · Tarea {{ selectedPhase }}</h3>
+        </div>
+      </div>
+      <ng-container *ngIf="selectedStage; else stagePlaceholder">
+        <ng-container
+          *ngIf="stageComponentToRender as component; else stageFallback"
+        >
+          <ng-container
+            *ngComponentOutlet="
+              component;
+              inputs: stageInputs;
+              outputs: stageOutputs
+            "
+          ></ng-container>
+        </ng-container>
+      </ng-container>
+      <ng-template #stagePlaceholder>
+        <div class="stage-panel__placeholder">
+          Selecciona una fase para comenzar.
+        </div>
+      </ng-template>
+      <ng-template #stageFallback>
+        <div class="stage-panel__loading">
+          <span class="spinner"></span>
+          <p>No se pudo cargar la fase seleccionada.</p>
+        </div>
+      </ng-template>
+      <div class="stage-panel__loading" *ngIf="childLoading">
+        <span class="spinner"></span>
+        <p>Cargando preguntas guardadas...</p>
+      </div>
+    </div>
+  </section>
+</div>

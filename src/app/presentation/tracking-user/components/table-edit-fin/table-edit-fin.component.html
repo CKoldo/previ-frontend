@@ -1,0 +1,129 @@
+<div class="table-edit">
+  <section class="table-edit__card">
+    <header class="table-edit__header">
+      <p class="table-edit__eyebrow">Herramientas administrativas</p>
+      <h1>Controlar cronograma de fases</h1>
+      <p>
+        Activa o desactiva manualmente cada fase para permitir o bloquear el
+        acceso al cuestionario correspondiente.
+      </p>
+    </header>
+    <div class="survey-edit__actions">
+      <button type="button" class="btn ghost" (click)="goBack()">
+        Regresar Home
+      </button>
+    </div>
+
+    <div class="table-edit__table-wrapper" *ngIf="rows.length; else emptyState">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="3" class="table-edit__title">
+              Cronograma de fases para el año 2025
+        </thead>
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Estado de la fase</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of rows | slice:0:5">
+            <td>
+              <div class="table-edit__stage">
+                <span class="table-edit__stage-badge">Fase {{ row.stage }}</span>
+                <strong>{{ row.labelStage }}</strong>
+              </div>
+            </td>
+
+            <td>
+              <div class="table-edit__toggle">
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="row.enable" name="enable-{{ row.stage }}" />
+                  <span class="toggle-switch__slider"></span>
+                </label>
+                <span class="table-edit__status" [ngClass]="row.enable ? 'is-active' : 'is-inactive'">
+                  {{ row.enable ? "Habilitada" : "Deshabilitada" }}
+                </span>
+              </div>
+            </td>
+
+            <td class="table-edit__actions">
+              <button type="button" (click)="saveRow(row)" [disabled]="savingStage === row.stage">
+                {{
+                savingStage === row.stage ? "Guardando..." : "Guardar estado"
+                }}
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <table>
+        <thead>
+          <tr>
+            <th colspan="3" class="table-edit__title">
+              Cronograma de fases para el año 2026
+        </thead>
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Estado de la fase</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of rows | slice:5:10">
+            <td>
+              <div class="table-edit__stage">
+                <span class="table-edit__stage-badge">Fase {{ row.stage }}</span>
+                <strong>{{ row.labelStage }}</strong>
+              </div>
+            </td>
+
+            <td>
+              <div class="table-edit__toggle">
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="row.enable" name="enable-{{ row.stage }}" />
+                  <span class="toggle-switch__slider"></span>
+                </label>
+                <span class="table-edit__status" [ngClass]="row.enable ? 'is-active' : 'is-inactive'">
+                  {{ row.enable ? "Habilitada" : "Deshabilitada" }}
+                </span>
+              </div>
+            </td>
+
+            <td class="table-edit__actions">
+              <button type="button" (click)="saveRow(row)" [disabled]="savingStage === row.stage">
+                {{
+                savingStage === row.stage ? "Guardando..." : "Guardar estado"
+                }}
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-edit__hint">
+      <p>
+        Los cambios afectan inmediatamente al cronograma que se usa en el módulo
+        de encuestas.
+      </p>
+    </footer>
+  </section>
+</div>
+
+<ng-template #emptyState>
+  <div class="table-edit__empty">
+    <p *ngIf="loading; else noData">Cargando cronograma...</p>
+    <ng-template #noData>
+      <p>No hay fases configuradas para editar.</p>
+    </ng-template>
+  </div>
+</ng-template>

@@ -1,0 +1,22 @@
+<div class="bg-white p-4 rounded-lg shadow-md">
+  <div class="overflow-x-auto">
+    <div>
+      <div class="mb-2">
+        <p class="text-red-500 text-sm">Ingrese porque no se completo la tarea</p>
+      </div>
+      <div class="mb-4 flex">
+        <div class="w-full pr-2">
+          <textarea
+            pInputText
+            id="codigo_local_ie"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md h-96 overflow-auto"
+            rows="10"
+            style="resize: none"
+            [(ngModel)]="comentario"
+            [disabled]="isDisabled()"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

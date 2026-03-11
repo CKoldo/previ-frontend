@@ -1,0 +1,69 @@
+
+<div class="w-full">
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <div class="mb-2">
+      <p class="text-red-500 text-sm">* Son datos obligatorios</p>
+    </div>
+
+    <!-- Control 1 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700">Marca la respuesta correcta sobre la situación del reporte de casos de violencia de la IE, en el SíseVe (Una sola opción):</label>
+      <p-select
+        [options]="situacionReporteOptions"
+        [(ngModel)]="situacionReporte"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar situación"
+        class="w-full p-2 border border-gray-300 rounded-md"
+        [appendTo]="'body'"
+        [disabled]="isCompletePhase && !isUpdateEnable"
+      />
+    </div>
+
+    <!-- Control 2 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700">¿A qué creen que se debe el historial y nivel actual del reporte de casos de violencia escolar de la IE?</label>
+      <textarea [(ngModel)]="historialReporte" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Escribe aquí tu respuesta..." [disabled]="isCompletePhase && !isUpdateEnable"></textarea>
+    </div>
+
+    <!-- Control 3 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700">Marca las dificultades que se encuentran en la IE para implementar y lograr el objetivo del PREVI</label>
+      <p-multiselect
+        [options]="dificultadesOptions"
+        [(ngModel)]="selectedDificultades"
+        placeholder="Seleccionar dificultades"
+        optionLabel="label"
+        optionValue="value"
+        display="chip"
+        styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md"
+        [disabled]="isCompletePhase && !isUpdateEnable"
+        appendTo="body"
+      />
+  <div *ngIf="selectedDificultades.length > 0" class="text-xs text-blue-500 mt-1">Seleccionados: {{ selectedDificultades.length }}</div>
+    </div>
+
+    <!-- Control 4 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700">Señalar los temas o situaciones que consideran necesario atender o reforzar para contribuir en el bienestar y la prevención de violencia escolar (Marcar las 5 alternativas con mayor puntaje)</label>
+      <p-multiselect
+        [options]="temasReforzarOptions"
+        [(ngModel)]="selectedTemasReforzar"
+        placeholder="Seleccionar temas/situaciones"
+        optionLabel="label"
+        optionValue="value"
+        display="chip"
+        styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md"
+        [disabled]="isCompletePhase && !isUpdateEnable"
+        appendTo="body"
+      />
+  <div *ngIf="selectedTemasReforzar.length > 0" class="text-xs text-blue-500 mt-1">Seleccionados: {{ selectedTemasReforzar.length }}</div>
+    </div>
+
+    <!-- Control 5 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700">¿Cuáles con las acciones propuestas para continuar con la prevención de la violencia en la IE?</label>
+      <textarea [(ngModel)]="accionesPropuestas" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Escribe aquí tus acciones..." [disabled]="isCompletePhase && !isUpdateEnable"></textarea>
+    </div>
+  </div>
+</div>

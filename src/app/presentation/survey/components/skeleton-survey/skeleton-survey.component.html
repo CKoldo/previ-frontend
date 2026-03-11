@@ -1,0 +1,16 @@
+<div class="skeleton-survey space-y-4 p-4 bg-slate-200 rounded-lg">
+  <div class="skeleton-header h-6 w-1/2 bg-slate-300 rounded animate-pulse mb-4"></div>
+  <div class="skeleton-body space-y-3 grid-cols-5 gap-6 grid">
+    <div class="col-span-3">
+    <div class="skeleton-item h-10 w-full mb-4 bg-slate-300 rounded animate-pulse" *ngFor="let item of [1, 2, 3, 4,5,6,7,8,9,10,11,12]"></div>
+  </div>
+    <div class="flex flex-col gap-8 col-span-2">
+      <div>
+      <div class="skeleton-item h-10 w-full mb-4 bg-slate-300 rounded animate-pulse" *ngFor="let item of [1, 2, 3, 4,5]"></div>
+    </div>
+    <div>
+      <div class="skeleton-item h-10 w-full mb-4 bg-slate-300 rounded animate-pulse" *ngFor="let item of [1, 2, 3, 4,5]"></div>
+    </div>
+    </div>
+  </div>
+</div>

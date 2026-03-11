@@ -1,0 +1,62 @@
+<div class="flex flex-col items-center justify-start w-screen py-10">
+  <div class="bg-[#eceef9] rounded-lg p-6 col-span-3 overflow-x-auto w-[90%] mx-8">
+    <div class="my-2 mt-0 overflow-x-auto h-full">
+      <div class="py-2 flex flex-col align-middle max-w-screen sm:px-6 lg:px-8 max-h-[1000px] justify-between">
+        <div class="flex gap-4 w-full items-center justify-center mt-4 pr-6 my-4">
+          <p-card>
+            <ng-template pTemplate="header">
+              <div class="flex items-center justify-center mt-5">
+                <i class="pi pi-user-edit text-4xl text-blue-500"></i>
+              </div>
+            </ng-template>
+            <div class="text-center">
+              <h2 class="text-xl font-bold mb-2">Actualizar Credenciales</h2>
+              <p class="text-gray-600 text-sm">Actualizar las credenciales de los usuarios</p>
+            </div>
+            <ng-template pTemplate="footer">
+              <div class="flex items-center justify-center">
+                <button pButton type="button" label="Ver Detalles" (click)="navigateToTableChecker()"></button>
+              </div>
+            </ng-template>
+          </p-card>
+
+          <p-card>
+            <ng-template pTemplate="header">
+              <div class="flex items-center justify-center mt-5">
+                <i class="pi pi-file-edit text-4xl text-blue-500"></i>
+              </div>
+            </ng-template>
+            <div class="text-center">
+              <h2 class="text-xl font-bold mb-2">Actualizar Fin Actividad</h2>
+              <p class="text-gray-600 text-sm">Actualizar el estado de finalización de la actividad</p>
+            </div>
+            <ng-template pTemplate="footer">
+              <div class="flex items-center justify-center">
+                <button pButton type="button" label="Ver Detalles" (click)="navigateToEdit()"></button>
+              </div>
+            </ng-template>
+          </p-card>
+
+          <p-card>
+            <ng-template pTemplate="header">
+              <div class="flex items-center justify-center mt-5">
+                <i class="pi pi-user-edit text-4xl text-blue-500"></i>
+              </div>
+            </ng-template>
+            <div class="text-center">
+              <h2 class="text-xl font-bold mb-2">Editar Reportes</h2>
+              <p class="text-gray-600 text-sm">Consulta y corrige las respuestas registradas</p>
+            </div>
+            <ng-template pTemplate="footer">
+              <div class="flex items-center justify-center">
+                <!-- aqui se agrego un boton que redirija a la pagina app table checker -->
+                <button pButton type="button" label="Ver Detalles" (click)="navigateToSurveyEdit()"></button>
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <app-footer /> -->

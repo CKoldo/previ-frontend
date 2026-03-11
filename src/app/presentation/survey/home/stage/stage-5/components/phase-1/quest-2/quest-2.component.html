@@ -1,0 +1,164 @@
+<div class="w-full">
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <!-- Control 1 -->
+    <!--
+    <div class="mb-2">
+      <p class="text-red-500 text-sm">* Son datos obligatorios</p>
+    </div>
+
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700">
+        <span class="text-red-500 text-sm mr-2">*</span>¿Se contó con la participación del EICE/ SP en la reunión?</label
+      >
+      <div class="flex gap-4 mt-2">
+        <div class="flex items-center">
+          <p-radiobutton
+            name="eice"
+            value="true"
+            [(ngModel)]="eiceParticipacion"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+          <label class="ml-2 text-sm text-black">Sí</label>
+        </div>
+        <div class="flex items-center">
+          <p-radiobutton
+            name="eice"
+            value="false"
+            [(ngModel)]="eiceParticipacion"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+          <label class="ml-2 text-sm text-black">No</label>
+        </div>
+      </div>
+    </div>
+    -->
+
+    <!-- Control 2 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700"
+        >Menciona 5 acciones / tareas que más recuerdan de los 3 años del PREVI</label
+      >
+      <textarea
+        [(ngModel)]="accionesRecuerdan"
+        rows="3"
+        class="w-full p-2 border border-gray-300 rounded-md"
+        placeholder="Escribe aquí las acciones/tareas..."
+        [disabled]="isCompletePhase && !isUpdateEnable"
+      ></textarea>
+    </div>
+
+    <!-- Control 3 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700"
+        >¿Qué contenidos han sido mejor acogidos por los diferentes actores? (Marcar los 5 contenidos con mayor puntaje)</label
+      >
+      <p-multiselect
+        [options]="contenidosAcogidos"
+        [(ngModel)]="selectedContenidosAcogidos"
+        placeholder="Seleccionar contenidos"
+        optionLabel="name"
+        optionValue="code"
+        display="chip"
+        styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md"
+          appendTo="body"
+        [disabled]="isCompletePhase && !isUpdateEnable"
+      />
+      <div *ngIf="selectedContenidosAcogidos.length > 0" class="text-xs text-blue-500 mt-1">Seleccionados: {{ selectedContenidosAcogidos.length }}</div>
+    </div>
+
+    <!-- Control 4 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700"
+        >¿Qué contenidos han generado resistencia y/o desafíos? (Marcar los 5 contenidos con mayor puntaje)</label
+      >
+      <p-multiselect
+        [options]="contenidosDesafio"
+        [(ngModel)]="selectedContenidosDesafio"
+        placeholder="Seleccionar contenidos"
+        optionLabel="name"
+        optionValue="code"
+        display="chip"
+        styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md"
+        appendTo="body"
+        [disabled]="isCompletePhase && !isUpdateEnable"
+      />
+      <div *ngIf="selectedContenidosDesafio.length > 0" class="text-xs text-blue-500 mt-1">Seleccionados: {{ selectedContenidosDesafio.length }}</div>
+    </div>
+
+    <!-- Control 5 -->
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700"
+        >¿Cuáles son resultados/cambios sobre prevención de la violencia escolar de la IE, a causa de la implementación del PREVI? (Marcar las 5 alternativas con mayor puntaje)</label
+      >
+      <p-multiselect
+        [options]="resultadosPrevencion"
+        [(ngModel)]="selectedResultadosPrevencion"
+        placeholder="Seleccionar resultados/cambios"
+        optionLabel="name"
+        optionValue="code"
+        display="chip"
+        styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md"
+        appendTo="body"
+        [disabled]="isCompletePhase && !isUpdateEnable"
+      />
+      <div *ngIf="selectedResultadosPrevencion.length > 0" class="text-xs text-blue-500 mt-1">Seleccionados: {{ selectedResultadosPrevencion.length }}</div>
+    </div>
+
+    <!-- Control 6 -->
+    <div class="mb-2">
+      <p class="text-red-500 text-sm">* Son datos obligatorios</p>
+    </div>
+
+    <div class="w-full mb-6">
+      <label class="block text-sm font-medium text-gray-700"
+        >¿Cuál es el número de casos reportados en el SíseVe en los años 2022, 2023, 2024 y 2025?</label
+      >
+      <div class="flex flex-wrap gap-4 mt-2">
+        <div class="flex flex-col">
+          <label class="text-xs">2022</label>
+          <p-inputnumber
+            type="number"
+            maxlength="5"
+            [(ngModel)]="casosSiseve[2022]"
+            class="p-2 border border-gray-300 rounded-md w-[100px]"
+            inputStyleClass="w-full"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-xs">2023</label>
+          <p-inputnumber
+            type="number"
+            maxlength="5"
+            [(ngModel)]="casosSiseve[2023]"
+            class="p-2 border border-gray-300 rounded-md w-[100px]"
+            inputStyleClass="w-full"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-xs">2024</label>
+          <p-inputnumber
+            type="number"
+            maxlength="5"
+            [(ngModel)]="casosSiseve[2024]"
+            class="p-2 border border-gray-300 rounded-md w-[100px]"
+            inputStyleClass="w-full"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-xs">2025</label>
+          <p-inputnumber
+            type="number"
+            maxlength="5"
+            [(ngModel)]="casosSiseve[2025]"
+            class="p-2 border border-gray-300 rounded-md w-[100px]"
+            inputStyleClass="w-full"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

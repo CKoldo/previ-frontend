@@ -1,0 +1,83 @@
+<div class="bg-white p-4 rounded-lg shadow-md">
+  <div class="overflow-x-auto">
+    <div>
+      <div class="mb-2">
+        <p class="text-red-500 text-sm">* Son datos obligatorios</p>
+      </div>
+      <div class="mb-4 flex">
+        <div class="w-full pr-2">
+          <textarea
+            pInputText
+            id="codigo_local_ie"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md h-96 overflow-auto"
+            rows="10"
+            style="resize: none"
+            [(ngModel)]="comentario"
+            [disabled]="isDisabled()"
+          ></textarea>
+        </div>
+      </div>
+      <div class="w-full my-2 mb-10">
+        <label class="text-base text-slate-900 font-medium mb-3 block"
+          ><span class="text-red-500! mr-2">*</span> ACTA (Implementación de la
+          tarea)</label
+        >
+        <p class="text-xs text-blue-500 mt-1">Ejemplo del rotulado de evidencia: {{examActaName}}</p>
+        <p class="text-xs text-red-500 mt-1">Tamaño máximo: 2MB</p>
+        <div class="flex items-center gap-4">
+          <input
+            type="file"
+            class="w-full text-slate-500 font-medium text-sm bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-blue-500 file:hover:bg-blue-700 file:text-white rounded"
+            (change)="isDisabled() ? null : onArchivoActaChange($event)"
+            id="archivoActaInput"
+            accept=".pdf"
+            [multiple]="false"
+            [disabled]="isDisabled()"
+            [ngClass]="{
+              'pointer-events-none cursor-not-allowed!': isDisabled()
+            }"
+          />
+          <span class="w-[200px] cursor-pointer underline text-blue-500" *ngIf="archivoActa" (click)="onDownloadArchivoActa()"><span class="pi pi-download mr-2"></span>Descargar acta</span>
+
+        </div>
+        <p class="text-xs text-slate-500 mt-2">
+          Archivos a subir en formato PDF
+        </p>
+      </div>
+      <div class="w-full my-2">
+        <label class="text-base text-slate-900 font-medium mb-3 block"
+          ><span class="text-red-500! mr-2">*</span>FOTO (Evidencia de la
+          implementación de la tarea)
+        </label>
+        <p class="text-xs text-blue-500 mt-1">Ejemplo del rotulado de evidencia: {{examFotoName}}</p>
+        <p class="text-xs text-red-500 mt-1">Tamaño máximo: 2MB</p>
+         <div class="flex items-center gap-4">
+        <input
+          type="file"
+          class="w-full text-slate-500 font-medium text-sm bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-blue-500 file:hover:bg-blue-700 file:text-white rounded"
+          (change)="isDisabled() ? null : onArchivoFotoChange($event)"
+          id="archivoFotoInput"
+          accept=".jpeg,.jpg,.png"
+          [multiple]="false"
+          [disabled]="isDisabled()"
+          [ngClass]="{
+            'pointer-events-none cursor-not-allowed!': isDisabled()
+          }"
+        />
+        <span class="w-[200px] cursor-pointer underline text-blue-500" *ngIf="archivoFoto" (click)="onDownloadArchivoFoto()"><span class="pi pi-download mr-2"></span>Descargar evidencia</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">
+          Archivos a subir en formato JPEG, JPG o PNG
+        </p>
+        <!-- <input
+        pInputText
+        type="text"
+        [(ngModel)]="archivoFotoName"
+        class="mt-1 block w-full p-2 border border-gray-300 rounded-md pointer-events-none"
+        [disabled]="true"
+        *ngIf="archivoFotoName"
+      /> -->
+      </div>
+    </div>
+  </div>
+</div>

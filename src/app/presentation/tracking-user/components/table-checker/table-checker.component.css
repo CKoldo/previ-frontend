@@ -1,0 +1,23 @@
+.survey-edit__actions {
+	grid-column: 1 / -1;
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+}
+.btn.ghost {
+	background: transparent;
+	color: #475569;
+	border: 1px solid #cbd5f5;
+}
+.btn {
+	border: none;
+	border-radius: 999px;
+	padding: 0.85rem 1.75rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+}
+.right{
+	justify-content: flex-end;
+}

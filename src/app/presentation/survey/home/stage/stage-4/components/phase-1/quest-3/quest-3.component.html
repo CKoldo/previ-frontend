@@ -1,0 +1,120 @@
+<div class="w-full">
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <div class="mb-2">
+      <p class="text-red-500 text-sm">* Son datos obligatorios</p>
+    </div>
+
+    <div class="w-full mb-6">
+      <label for="nombre_ie" class="block text-sm font-medium text-gray-700"
+        >Rango de aplicación</label
+      >
+
+      <p-select
+        [options]="ranges"
+        [(ngModel)]="rangoAplicacion"
+        optionLabel="name"
+        placeholder="Seleccionar rango"
+        class="w-[300px] p-2 border border-gray-300 rounded-md"
+        [appendTo]="'body'"
+        [showClear]="true"
+      />
+    </div>
+
+    <h3 class="text-sm text-gray-500 font-semibold">
+      <span class="text-red-500 text-sm mr-2">*</span>¿El CGB (actor diferente
+      al EICE o SP) realizó la tarea?
+    </h3>
+    <div class="mb-6">
+      <div class="my-4 flex flex-wrap gap-4">
+        <div class="flex items-center">
+          <p-radiobutton
+            name="pizza"
+            value="true"
+            [(ngModel)]="quest1"
+            (ngModelChange)="onQuest1Change($event)"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          ></p-radiobutton>
+          <label for="ingredient1" class="ml-2 text-sm text-black">Si</label>
+        </div>
+
+        <div class="flex items-center">
+          <p-radiobutton
+            name="pizza"
+            value="false"
+            [(ngModel)]="quest1"
+            (ngModelChange)="onQuest1Change($event)"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          ></p-radiobutton>
+          <label for="ingredient2" class="ml-2 text-sm text-black">No</label>
+        </div>
+      </div>
+    </div>
+    <h3 class="text-sm text-gray-500 font-semibold mt-4">
+      <span class="text-red-500 text-sm mr-2" *ngIf="quest1 == 'true'">*</span
+      >Si respondió "Sí" en la pregunta anterior, ¿qué miembro(s) del CGB
+      implementaron la tarea?
+    </h3>
+    <div class="mb-6 flex">
+      <div class="w-full pr-2">
+        <p-multiselect
+          [options]="members"
+          [(ngModel)]="selectedMembersQ1"
+          placeholder="Seleccionar miembros"
+          optionLabel="name"
+          optionValue="code"
+          display="chip"
+          styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md"
+          [disabled]="!validateDisable(quest1)"
+        />
+      </div>
+    </div>
+    <h3 class="text-sm text-gray-500 font-semibold mt-4">
+      <span class="text-red-500 text-sm mr-2">*</span>¿El CGB presentó medios de
+      verificación (lista de asistencia y foto)?
+    </h3>
+    <div class="mb-6">
+      <div class="my-4 flex flex-wrap gap-4">
+        <div class="flex items-center">
+          <p-radiobutton
+            name="pizza"
+            value="true"
+            [(ngModel)]="quest2"
+            (ngModelChange)="onQuest2Change($event)"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+          <label for="ingredient1" class="ml-2 text-sm text-black">Si</label>
+        </div>
+
+        <div class="flex items-center">
+          <p-radiobutton
+            name="pizza"
+            value="false"
+            [(ngModel)]="quest2"
+            (ngModelChange)="onQuest2Change($event)"
+            [disabled]="isCompletePhase && !isUpdateEnable"
+          />
+          <label for="ingredient2" class="ml-2 text-sm text-black">No</label>
+        </div>
+      </div>
+    </div>
+    <h3 class="text-sm text-gray-500 font-semibold mt-4">
+      <span class="text-red-500 text-sm mr-2" *ngIf="quest2 == 'true'">*</span
+      >Si respondió "Sí" en la pregunta anterior, especificar N° Total de
+      docentes tutores participantes
+    </h3>
+    <div class="mb-4 flex">
+      <div class="w-full pr-2">
+        <p-inputnumber
+          class="rounded-md p-2"
+          [(ngModel)]="cantidadDocentes"
+          maxlength="3"
+          [useGrouping]="false"
+          [inputStyle]="{ width: '300px' }"
+          [disabled]="!validateDisable(quest2)"
+        />
+
+        <!-- <p-multiselect [options]="members" [(ngModel)]="selectedMembersQ2" placeholder="Seleccionar miembros" optionLabel="name" optionValue="code" display="chip" styleClass="mt-1 w-full p-2 border border-gray-300 rounded-md" [disabled]="!validateDisable(quest2)" /> -->
+      </div>
+    </div>
+  </div>
+</div>

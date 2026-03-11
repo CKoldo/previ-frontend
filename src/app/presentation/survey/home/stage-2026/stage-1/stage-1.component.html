@@ -1,0 +1,18 @@
+@switch (phase) {
+  @case (1){
+    <app-phase-1 [question]="question" [isAllStagesCompleted]="isAllStagesCompleted" (isLoadingInformation)="setLoadingState($event)"/>
+  }
+  @case (2){
+    <app-phase-2 [question]="question" [isAllStagesCompleted]="isAllStagesCompleted" (isLoadingInformation)="setLoadingState($event)"/>
+  }
+  @case (3){
+    <app-phase-3 [question]="question" [isAllStagesCompleted]="isAllStagesCompleted" (isLoadingInformation)="setLoadingState($event)"/>
+  }
+  @case (4){
+    <app-phase-4 [question]="question" [isAllStagesCompleted]="isAllStagesCompleted" (isLoadingInformation)="setLoadingState($event)"/>
+  }
+  @case (5){
+    <app-phase-5 [question]="question" [isAllStagesCompleted]="isAllStagesCompleted" (isLoadingInformation)="setLoadingState($event)"/>
+  }
+}
+

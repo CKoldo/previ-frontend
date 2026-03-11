@@ -1,0 +1,183 @@
+<div class="w-full px-5 flex justify-center">
+  <p-table
+    [value]="listaIEs"
+    class="w-full text-sm"
+    [scrollable]="true"
+    scrollHeight="800px"
+    [emptyMessage]="emptyTableMessage"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <!-- <th rowspan="2" class="border border-gray-300 px-4 py-2" pFrozenColumn *ngIf="!esUGEL">DRE</th> -->
+         <!--
+        <th
+          rowspan="2"
+          class="border border-gray-300 px-4 py-2"
+          alignFrozen="left"
+          pFrozenColumn
+          [frozen]="true"
+          *ngIf="!esUGEL"
+        >
+          UGEL
+        </th>
+        -->
+        <th
+          rowspan="2"
+          class="border border-gray-300 px-4 py-2"
+          alignFrozen="left"
+          pFrozenColumn
+          [frozen]="true"
+        >
+          Institución
+        </th>
+        <th
+          *ngFor="let stage of arrayTabla"
+          [attr.colspan]="stage.phase.length"
+          class="border border-gray-300 px-4 py-2 text-center"
+        >
+          {{ stage.label }}
+        </th>
+        <th
+          rowspan="2"
+          class="border border-gray-300 px-4 py-2"
+          alignFrozen="right"
+          pFrozenColumn
+          [frozen]="true"
+        >
+          Descarga archivo
+        </th>
+      </tr>
+      <tr>
+        <th
+          *ngFor="let phase of phaseHeaders"
+          class="border border-gray-300 px-4 py-2"
+        >
+          <div class="w-[80px] text-center">{{ phase.label }}</div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-ie>
+      <tr class="odd:bg-white even:bg-gray-50">
+        <!-- <td class="border border-gray-300 px-4 py-2 font-medium " pFrozenColumn *ngIf="!esUGEL"><div class="w-[250px]" >{{ ie.DRE }}</div></td> -->
+        <td
+          class="border border-gray-300 px-4 py-2 font-medium"
+          alignFrozen="left"
+          pFrozenColumn
+          [frozen]="true"
+          *ngIf="!esUGEL && esDRE"
+        >
+          <div class="w-[250px]">{{ ie.UGEL }}</div>
+        </td>
+        <td
+          class="border border-gray-300 px-4 py-2 font-medium"
+          alignFrozen="left"
+          pFrozenColumn
+          [frozen]="true"
+        >
+          <div class="w-[350px] flex flex-col">
+            <span>{{ ie.CODIGO_LOCAL }} - {{ ie.NOMBRE_IE }}</span>
+            <span
+              class="text-[11px] uppercase tracking-wide text-sky-700 font-semibold"
+              >Año {{ ie.trackingYear || scheduleYear }}</span
+            >
+          </div>
+        </td>
+        <td
+          *ngFor="let phase of phaseHeaders"
+          class="border border-gray-300 px-4 py-2 text-center"
+        >
+          <p-checkbox
+            [ngModel]="getChecks(ie, phase)"
+            [binary]="true"
+            class="pointer-events-none"
+          ></p-checkbox>
+        </td>
+        <td
+          class="border border-gray-300 px-4 py-2 font-medium"
+          alignFrozen="right"
+          pFrozenColumn
+          [frozen]="true"
+        >
+          <div class="w-full text-center">
+            <span
+              class="pi pi-file-export cursor-pointer text-green-500"
+              title="Descargar archivos"
+              (click)="showPhaseDialog(ie)"
+            ></span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Diálogo para selección de fases y descarga de archivos -->
+<p-dialog
+  [(visible)]="phaseDialog"
+  [style]="{ width: '800px' }"
+  header="Descarga de archivos"
+  [modal]="true"
+  [autoZIndex]="true"
+  [baseZIndex]="10000"
+  [closeOnEscape]="false"
+  [closable]="false"
+  [dismissableMask]="true"
+  [resizable]="false"
+  [draggable]="false"
+  [focusOnShow]="false"
+  [showHeader]="true"
+  [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto' }"
+>
+  <ng-template #content>
+    <div>
+      <label for="name" class="block mb-3"
+        ><span class="font-bold">Institución:</span>
+        {{ selectIE?.CODIGO_LOCAL }} - {{ selectIE?.NOMBRE_IE }}</label
+      >
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div
+        *ngFor="let s of stagesWithPhases"
+        class="mb-4 bg-white rounded-lg shadow p-4"
+      >
+        <label class="block font-semibold mb-2"
+          >Fase {{ s.displayStage }}</label
+        >
+        <p-listbox
+          [options]="s.phases"
+          [(ngModel)]="selectedPhasesByStage[s.stage]"
+          [multiple]="true"
+          [checkbox]="true"
+          class="w-full"
+          appendTo="body"
+        >
+          <ng-template let-phase pTemplate="item">
+            Tarea {{ phase }}
+          </ng-template>
+        </p-listbox>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #footer class="mt-4">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      text
+      (click)="phaseDialog = false"
+    />
+    <p-button
+      label="Editar tarea seleccionada"
+      icon="pi pi-pencil"
+      severity="secondary"
+      (click)="navigateToEditTask()"
+      [disabled]="!canEditSelectedPhase()"
+    />
+    <p-button
+      label="Descargar archivos seleccionados"
+      icon="pi pi-download"
+      (click)="downloadFiles()"
+      [disabled]="!verifyPhaseSelected()"
+    />
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,56 @@
+<div class="flex flex-col justify-between">
+	<div class="flex justify-between items-center">
+		<h3 class="text-xl text-slate-900 font-semibold mb-4 mt-0">
+			<div class="flex flex-col items-start">
+				<span class="w-full text-2xl mb-4">Asistencia técnica para elaboración del Plan TOECE y desarrollo de Habilidades socioemocionales</span>
+				@switch (question) {
+				@case (1) {
+				<span class="text-xl font-normal">Directivos por Nivel Educativo</span>
+				}
+				@case (2) {
+				<span class="text-xl font-normal">Docentes tutores</span>
+				}
+				@case (3) {
+				<span class="text-xl font-normal">Comentarios adicionales</span>
+				}
+				}
+			</div>
+		</h3>
+		@if (question == 3) {
+		<div>
+			<div class="w-60 bg-gray-200 rounded-full h-2 mb-2">
+				<div class="bg-green-600 h-2 rounded-full animate-pulse" style="transition: width 1s ease-in-out"
+					[style.width.%]="100"></div>
+			</div>
+			<span class="text-md text-gray-500 flex items-end justify-end mb-2"></span>
+		</div>
+		} @else {
+		<div>
+			<div class="w-60 bg-gray-200 rounded-full h-2 mb-2">
+				<div class="bg-blue-600 h-2 rounded-full animate-pulse" style="transition: width 1s ease-in-out"
+					[style.width.%]="progressBarWidthClass(question, 2)"></div>
+			</div>
+			<span class="text-md text-gray-500 flex items-end justify-end mb-2">{{ question }}/2</span>
+		</div>
+		}
+	</div>
+	<div *ngIf="isLoading">
+		<app-skeleton-survey />
+	</div>
+	<div *ngIf="!isLoading">
+		<div class="my-4 mt-0 max-h-[60vh] overflow-auto">
+			<app-quest-1 [ngClass]="{ hidden: question != 1 }" [dataEntry]="objQuestion ? objQuestion[1] : null"
+				[isCompletePhase]="isCompletePhase" [isUpdateEnable]="isUpdateEnable"></app-quest-1>
+			<app-quest-2 [ngClass]="{ hidden: question != 2 }" [dataEntry]="objQuestion ? objQuestion[2] : null"
+				[isCompletePhase]="isCompletePhase" [isUpdateEnable]="isUpdateEnable"></app-quest-2>
+			<app-comments [ngClass]="{ hidden: !showComments() }" [dataEntry]="objQuestion ? objQuestion[3] : null"
+				[archivoName]="archivoName ? archivoName : null" [isCompletePhase]="isCompletePhase"
+				[isUpdateEnable]="isUpdateEnable" [selectedStage]="stage" [selectedPhase]="phase"></app-comments>
+			<app-undone-task [ngClass]="{ hidden: !showUndoneTask() }" [dataEntry]="objQuestion ? objQuestion[3] : null"
+				[isCompletePhase]="isCompletePhase" [isUpdateEnable]="isUpdateEnable"></app-undone-task>
+		</div>
+		<app-buttons [isCompletePhase]="isCompletePhase" [isUpdateEnable]="isUpdateEnable" [countQuestion]="3"
+			[currentStep]="question" [selectedStage]="stage" [selectedPhase]="phase" (nextStepEmit)="nextStep($event)"
+			(prevStepEmit)="previousStep($event)" (finalStepEmit)="finishSurvey($event)"></app-buttons>
+	</div>
+</div>

@@ -1,0 +1,157 @@
+<div class="home flex flex-col items-center justify-start w-screen py-10">
+  <!-- Contenido principal -->
+  <div class="w-full p-6 grid grid-cols-4 gap-4">
+
+    <!-- LATERAL -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Identificación IE -->
+      <div class="bg-[#eceef9] rounded-lg p-6 w-full h-[450px]">
+        <div class="flex flex-col">
+          <div class="overflow-x-auto">
+            <div class="py-2 align-middle inline-block min-w-full">
+              <app-ie-identification />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información implementación -->
+      <div
+        class="bg-[#eceef9] rounded-lg p-6 w-full max-h-[600px]"
+        [ngClass]="{ 'bg-transparent!': !selectedStage }"
+      >
+        <div class="flex flex-col">
+          <div class="overflow-x-auto">
+            <div class="py-2 align-middle inline-block min-w-full">
+
+              <!-- Información cuando carga -->
+              <app-information-implementation
+                [selectedStage]="selectedStage"
+                [selectedPhase]="selectedPhase"
+                [isAllStagesCompleted]="isAllStagesCompleted"
+                *ngIf="!isLoading"
+              />
+
+              <!-- Skeleton loading -->
+              <div class="flex flex-col" *ngIf="selectedStage && isLoading">
+                <div class="overflow-x-auto">
+                  <div class="py-2 align-middle inline-block min-w-full">
+                    <div class="flex flex-col gap-8 col-span-2">
+                      <div>
+                        <div
+                          class="skeleton-item h-10 w-full mb-4 bg-slate-300 rounded animate-pulse"
+                          *ngFor="let item of [1,2]"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRONOGRAMA -->
+    <div class="bg-[#eceef9] rounded-lg p-6 w-full col-span-3">
+
+      <div class="my-2 mt-0 overflow-x-auto h-full">
+        <div
+          class="py-2 flex flex-col align-middle min-w-full sm:px-6 lg:px-8 max-h-[1000px] justify-between"
+        >
+
+          <!-- Si hay stage seleccionado -->
+          @if (selectedStage && stageComponentToRender) {
+
+            <!-- CONTENEDOR DINÁMICO -->
+            <ng-container #stageContainer></ng-container>
+
+          } @else {
+
+            <!-- Tarjetas cronograma -->
+            <div class="flex flex-col gap-6">
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <p-card
+                  *ngFor="let card of scheduleCards"
+                  class="cursor-pointer transition-all duration-200 border border-transparent"
+                  [ngClass]="{
+                    'border-sky-600 shadow-lg bg-white': selectedScheduleYear === card.year,
+                    'bg-white/90 hover:-translate-y-1 hover:shadow-md': selectedScheduleYear !== card.year
+                  }"
+                  (click)="selectScheduleCard(card.year)"
+                >
+
+                  <ng-template pTemplate="header">
+                    <div class="flex items-center justify-between gap-3">
+
+                      <div class="flex items-center gap-2">
+                        <i
+                          class="pi text-2xl text-blue-500"
+                          [ngClass]="card.icon"
+                        ></i>
+
+                        <span class="text-lg font-semibold text-slate-900">
+                          {{ card.title }}
+                        </span>
+                      </div>
+
+                      <span class="text-xs uppercase tracking-wide text-slate-500">
+                        {{ card.year }}
+                      </span>
+
+                    </div>
+                  </ng-template>
+
+                  <p class="text-sm text-slate-600 mt-2">
+                    {{ card.description }}
+                  </p>
+
+                  <ng-template pTemplate="footer">
+                    <div class="text-sm font-medium text-blue-600 flex items-center gap-2">
+                      <i class="pi pi-arrow-right"></i>
+                      Ver cronograma
+                    </div>
+                  </ng-template>
+
+                </p-card>
+
+              </div>
+
+              <!-- Switch cronogramas -->
+              <ng-container [ngSwitch]="selectedScheduleYear">
+
+                <app-schedule
+                  *ngSwitchCase="'2025'"
+                  (selectedStage)="selectedStageExc($event)"
+                />
+
+                <app-schedule-2026
+                  *ngSwitchCase="'2026'"
+                  (selectedStage)="selectedStageExc($event)"
+                />
+
+                <div
+                  class="flex items-center justify-center rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500"
+                  *ngSwitchDefault
+                >
+                  Selecciona un cronograma para ver las fases disponibles.
+                </div>
+
+              </ng-container>
+
+            </div>
+
+          }
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
