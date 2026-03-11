@@ -25,12 +25,12 @@ import { Component, EventEmitter, Output } from '@angular/core';
 export class Schedule2026Component {
     formatDate(dateStr: string): string {
       if (!dateStr) return '';
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return '';
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}/${month}/${day}`;
+      // Si el string tiene formato ISO, extrae los primeros 10 caracteres
+      // Ejemplo: 2026-04-01T00:00:00.000Z => 2026-04-01
+      const iso = dateStr.slice(0, 10);
+      const [year, month, day] = iso.split('-');
+      if (year && month && day) return `${year}/${month}/${day}`;
+      return '';
     }
   @Output() selectedStage = new EventEmitter<any>();
 
@@ -127,15 +127,24 @@ export class Schedule2026Component {
     if (saveStageEnable) {
       enableDatesArr = JSON.parse(saveStageEnable);
     }
-    // Asignar start y end si existen
-    if (enableDatesArr.length > 0 && enableDatesArr[0].start && enableDatesArr[0].end) {
-      this.enableDates = {
-        start: enableDatesArr[0].start,
-        end: enableDatesArr[0].end
+    console.log('enableDatesArr', enableDatesArr);
+    // Asignar fechas a cada stage
+    stagesData = stagesData.map((stage: any) => {
+      const found = enableDatesArr.find((e: any) => e.stage == stage.stage + 5);
+      if (found) {
+        return {
+          ...stage,
+          enableDates: {
+            start: found.start,
+            end: found.end
+          }
+        };
+      }
+      return {
+        ...stage,
+        enableDates: {}
       };
-    } else {
-      this.enableDates = {};
-    }
+    });
     const shouldForceStageOne = enableDatesArr.length === 0;
     let stages = stagesData.map((stage: any) => {
       const found = enableDatesArr.find((e: any) => e.stage == stage.stage +5);
