@@ -251,10 +251,10 @@ export class TableCheckerComponent implements OnInit, OnChanges {
         }));
         
         this.buildListBoxStages(fasesTareas);
-        console.log('Stages con phases disponibles:', fasesTareas);
+        //console.log('Stages con phases disponibles:', fasesTareas);
 
       }
-      console.log('Archivos obtenidos:', this.arrayArchivos);
+      //console.log('Archivos obtenidos:', this.arrayArchivos);
 
 
       // 4. Close the loading dialog

@@ -543,7 +543,7 @@ export class Phase5Component {
   }
 
   fillQuestionAnswer(data: any, respuesta: any) {
-    console.log('data respuesta', data);
+    //console.log('data respuesta', data);
     let objImplementacion: any = {
       fechaModalidad: data.FECHA_MODALIDAD,
       modalidad: data.MODALIDAD,

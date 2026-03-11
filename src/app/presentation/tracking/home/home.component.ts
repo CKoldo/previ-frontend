@@ -117,7 +117,7 @@ export class HomeComponent implements OnInit {
       window.localStorage,
       this.selectedScheduleYear,
     );
-    console.log('Data preparada para reporte:', conf);
+    //console.log('Data preparada para reporte:', conf);
     return conf;
   }
 
@@ -140,7 +140,7 @@ export class HomeComponent implements OnInit {
     this._reportService
       .exportarReportePorRangos(dataEntry, templateMeta)
       .then(() => {
-        console.log('Reporte generado exitosamente', dataEntry);
+        //console.log('Reporte generado exitosamente', dataEntry);
         this.isLoadingDownload = false;
       })
       .catch((error) => {

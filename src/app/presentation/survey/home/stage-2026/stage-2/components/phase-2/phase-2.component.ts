@@ -262,13 +262,13 @@ export class Phase2Component {
       REGISTRA_TAREA: this.tareaImplementada,
       YEAR: stageYear
     };
-
+    /*
     console.log('[Stage-2026][Phase-2] Payload to insertar', {
       ...objLog,
       ARCHIVO_ACTA: this.archivoActa ? this.archivoActa.name : '(sin acta)',
       ARCHIVO_EVIDENCIA: this.archivoFoto ? this.archivoFoto.name : '(sin evidencia)'
     });
-
+    */
     const objLogConfiguration = {
       DATOS_JSON: JSON.stringify(temporalData),
       ARCHIVO_ACTA: this.archivoActa ? this.archivoActa.name : '',
