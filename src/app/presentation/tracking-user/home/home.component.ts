@@ -8,13 +8,18 @@ import { TableCheckerComponent } from '../components/table-checker/table-checker
 import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, FooterComponent, TableCheckerComponent, ButtonModule, CardModule],
+  imports: [
+    CommonModule,
+    //FooterComponent,
+    //TableCheckerComponent,
+    ButtonModule,
+    CardModule,
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  constructor(private router: Router
-  ) {}
+  constructor(private router: Router) {}
   //navigate to table checker component
   navigateToTableChecker() {
     this.router.navigate(['/tracking-user/app-table-checker']);
@@ -27,5 +32,4 @@ export class HomeComponent {
   navigateToSurveyEdit() {
     this.router.navigate(['/tracking-user/survey-edit']);
   }
-
 }

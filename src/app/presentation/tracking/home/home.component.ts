@@ -21,13 +21,19 @@ import { TableCheckerComponent } from '../components/table-checker/table-checker
 import { GenerateReportCommand } from 'app/application/survey/generate-report/generate-report.command';
 import { GenerateReportHandler } from 'app/application/survey/generate-report/generate-report.handler';
 import { ButtonModule } from 'primeng/button';
-import { ScheduleYear, getActiveStageYear, setActiveStageYear } from 'app/shared/utils/stage-storage.util';
+import {
+  ScheduleYear,
+  getActiveStageYear,
+  setActiveStageYear,
+} from 'app/shared/utils/stage-storage.util';
 
 import { prepareDataForReport } from './report';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, FooterComponent, TableCheckerComponent, ButtonModule],
+  imports: [CommonModule, 
+    //FooterComponent, 
+    TableCheckerComponent, ButtonModule],
   providers: [
     { provide: ISurveyRepository, useClass: SurveyRepository },
     { provide: SaveStagePhaseCommand, useClass: SaveStagePhaseHandler },
@@ -47,7 +53,10 @@ export class HomeComponent implements OnInit {
     '2026': false,
   };
 
-  private readonly reportTemplates: Record<ScheduleYear, { templatePath: string; fileName: string }> = {
+  private readonly reportTemplates: Record<
+    ScheduleYear,
+    { templatePath: string; fileName: string }
+  > = {
     '2025': {
       templatePath: 'assets/template/reporte-previ-formato.xlsx',
       fileName: 'reporte-previ.xlsx',
@@ -64,23 +73,23 @@ export class HomeComponent implements OnInit {
     description: string;
     icon: string;
   }> = [
-      {
-        year: '2025',
-        title: 'Seguimiento 2025',
-        description: 'Fases registradas en el plan vigente.',
-        icon: 'pi-calendar',
-      },
-      {
-        year: '2026',
-        title: 'Seguimiento 2026',
-        description: 'Registros piloto del próximo año.',
-        icon: 'pi-calendar-clock',
-      },
-    ];
+    {
+      year: '2025',
+      title: 'Seguimiento 2025',
+      description: 'Fases registradas en el plan vigente.',
+      icon: 'pi-calendar',
+    },
+    {
+      year: '2026',
+      title: 'Seguimiento 2026',
+      description: 'Registros piloto del próximo año.',
+      icon: 'pi-calendar-clock',
+    },
+  ];
 
   constructor(
     private _reportService: ReportService,
-    private _GenerateReportCommand: GenerateReportCommand
+    private _GenerateReportCommand: GenerateReportCommand,
   ) {}
 
   ngOnInit(): void {
@@ -102,18 +111,16 @@ export class HomeComponent implements OnInit {
     this.refreshYearAvailability();
   }
 
-
   async prepareDataForReport() {
     const conf = await prepareDataForReport(
       this._GenerateReportCommand,
       window.localStorage,
-      this.selectedScheduleYear
+      this.selectedScheduleYear,
     );
     console.log('Data preparada para reporte:', conf);
     return conf;
   }
 
-  
   async generateReport() {
     if (this.isLoadingDownload) {
       return;
@@ -190,7 +197,7 @@ export class HomeComponent implements OnInit {
     }
 
     const fallback = (['2025', '2026'] as ScheduleYear[]).find(
-      (year) => this.yearAvailability[year]
+      (year) => this.yearAvailability[year],
     );
 
     if (fallback) {

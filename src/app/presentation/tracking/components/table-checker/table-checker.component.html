@@ -4,12 +4,18 @@
     class="w-full text-sm"
     [scrollable]="true"
     scrollHeight="800px"
-    [emptyMessage]="emptyTableMessage"
+
   >
+    <ng-template pTemplate="emptymessage">
+      <div class="py-8 text-center text-gray-500">
+        {{ emptyTableMessage }}
+      </div>
+    </ng-template>
+
     <ng-template pTemplate="header">
       <tr>
         <!-- <th rowspan="2" class="border border-gray-300 px-4 py-2" pFrozenColumn *ngIf="!esUGEL">DRE</th> -->
-         <!--
+        <!--
         <th
           rowspan="2"
           class="border border-gray-300 px-4 py-2"
