@@ -325,9 +325,9 @@ export class SignInComponent {
       );
 
       localStorage.setItem('dataStageEnable', JSON.stringify(dateEnableByYear));
-      console.log('peticion al sign in');
-      console.log('estructura parseada:', dateEnableByYear);
-      console.log('del backend:', resultDates);
+      //console.log('peticion al sign in');
+      //console.log('estructura parseada:', dateEnableByYear);
+      //console.log('del backend:', resultDates);
       localStorage.setItem('dataUser', JSON.stringify(datos));
       this._Router.navigate(['/survey']);
       return;
