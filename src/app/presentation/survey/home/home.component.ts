@@ -4,6 +4,7 @@ import { TemporalSaveService } from './../../../shared/services/temporal-save.se
 import { Component, Type, ViewChild } from '@angular/core';
 import { IeIdentificationComponent } from './ie-identification/ie-identification.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { Schedule2026Component } from './schedule-2026/schedule-2026.component';
@@ -28,7 +29,7 @@ import { Stage2Component as Stage2Component2026 } from './stage-2026/stage-2/sta
 import { Stage3Component as Stage3Component2026 } from './stage-2026/stage-3/stage-3.component';
 import { Stage4Component as Stage4Component2026 } from './stage-2026/stage-4/stage-4.component';
 import { Stage5Component as Stage5Component2026 } from './stage-2026/stage-5/stage-5.component';
-import { CardModule } from 'primeng/card';
+import { SelectModule } from 'primeng/select';
 import {
   ScheduleYear,
   setActiveStageYear,
@@ -47,11 +48,12 @@ interface StageSelectionPayload {
   selector: 'app-home',
   imports: [
     CommonModule,
+    FormsModule,
     IeIdentificationComponent,
     ScheduleComponent,
     Schedule2026Component,
     InformationImplementationComponent,
-    CardModule,
+    SelectModule,
   ],
   providers: [
     { provide: ISurveyRepository, useClass: SurveyRepository },
@@ -80,7 +82,7 @@ export class HomeComponent {
   countQuestion = 0;
 
   selectedScheduleYear: ScheduleYear | null = null;
-  readonly scheduleCards: ReadonlyArray<{
+  scheduleCards: Array<{
     year: ScheduleYear;
     title: string;
     description: string;

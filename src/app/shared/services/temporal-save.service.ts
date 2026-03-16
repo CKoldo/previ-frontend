@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 export class TemporalSaveService {
 
   constructor() {
-      console.log('[TemporalSaveService] Instancia creada');
+    console.log('[TemporalSaveService] Instancia creada');
   }
 
   private tempDataSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
@@ -20,17 +20,17 @@ export class TemporalSaveService {
   private dataInformationImplementationSubject = new BehaviorSubject<any>(null);
   dataInformationImplementation$ = this.dataInformationImplementationSubject.asObservable();
 
-  private tempDataNoTarea= new BehaviorSubject<boolean>(true);
+  private tempDataNoTarea = new BehaviorSubject<boolean>(true);
   public dataNoTarea$ = this.tempDataNoTarea.asObservable();
 
 
-  init(initialData: any){
+  init(initialData: any) {
     if (!this.isInitialized) {
       const storedData = this.loadDataFromLocalStorage();
       if (storedData) {
         this.tempDataSubject.next(storedData);
       } else {
-          this.tempDataSubject.next(initialData);
+        this.tempDataSubject.next(initialData);
         this.saveDataToLocalStorage(initialData);
       }
       this.isInitialized = true; // Marcamos como inicializado
@@ -97,28 +97,27 @@ export class TemporalSaveService {
   }
 
   setDataInformationImplementation(data: any) {
-
     localStorage.setItem('dataInformationImplementation', JSON.stringify(data));
     this.dataInformationImplementationSubject.next(data); // Emite nuevos valores
   }
 
-  getDataInformationImplementation():  Observable<any> {
+  getDataInformationImplementation(): Observable<any> {
     let data = localStorage.getItem('dataInformationImplementation');
-     data = data ? JSON.parse(data) : null;
+    data = data ? JSON.parse(data) : null;
     this.dataInformationImplementationSubject.next(data);
-     return this.dataInformationImplementationSubject.asObservable();
+    return this.dataInformationImplementationSubject.asObservable();
   }
 
 
   getStage(): Observable<any> {
     let data = localStorage.getItem('stage');
     data = data ? JSON.parse(data) : null;
-   this.stageSubject.next(data);
+    this.stageSubject.next(data);
     return this.stageSubject.asObservable();
   }
 
-    emitChangeStatusTarea(data: any) {
-      console.log('[Servicio] Emitiendo cambio de estado de tarea:', data);
+  emitChangeStatusTarea(data: any) {
+    console.log('[Servicio] Emitiendo cambio de estado de tarea:', data);
     this.tempDataNoTarea.next(data);
   }
 

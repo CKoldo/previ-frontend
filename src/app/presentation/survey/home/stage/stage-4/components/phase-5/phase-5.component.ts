@@ -247,6 +247,9 @@ export class Phase5Component {
   private async saveSurveyData(temporalData: any): Promise<boolean> {
     const savedStage: any = localStorage.getItem('stage');
     if (!savedStage) return false;
+    const stages = JSON.parse(savedStage);
+    const currentStageConfig = stages.find((stage: any) => stage.stage == this.stage);
+    const stageYear = currentStageConfig?.YEAR ?? currentStageConfig?.year ?? '2025';
 
     const dataUser: any = localStorage.getItem('dataUser');
     let numeroDocumento = '';
@@ -277,6 +280,7 @@ export class Phase5Component {
       // FECHA_IMPLEMENTACION:
       //   temporalDataInformationImplementation.fechaImplementacion,
       REGISTRA_TAREA: this.tareaImplementada,
+      YEAR: stageYear,
     };
 
     const objLogConfiguration = {
@@ -290,6 +294,7 @@ export class Phase5Component {
       // FECHA_IMPLEMENTACION:
       //   temporalDataInformationImplementation.fechaImplementacion,
       REGISTRA_TAREA: this.tareaImplementada,
+      YEAR: stageYear,
     };
 
     let esTareaNoImplementada =
@@ -300,7 +305,6 @@ export class Phase5Component {
         ? this._UpdateStagePhaseCommand.execute(objLog)
         : this._SaveStagePhaseCommand.execute(objLog));
       if (result) {
-        let stages = JSON.parse(savedStage);
         stages.map((stage: any) => {
           if (stage.stage == this.stage) {
             stage.survey.map((survey: any) => {

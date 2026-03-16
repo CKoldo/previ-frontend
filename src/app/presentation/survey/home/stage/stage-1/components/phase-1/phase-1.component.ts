@@ -272,6 +272,8 @@ showUndoneTask(): boolean {
       YEAR: stageYear
     };
 
+
+
     const objLogConfiguration = {
       DATOS_JSON: JSON.stringify(temporalData),
       ARCHIVO_ACTA: this.archivoActa?this.archivoActa.name:'',
@@ -318,6 +320,7 @@ showUndoneTask(): boolean {
       return false;
     }
     return false;
+   
   }
 
   public async finishSurvey(step: number) {

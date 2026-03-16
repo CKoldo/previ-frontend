@@ -5,6 +5,7 @@ import { TemporalSaveService } from './../../../shared/services/temporal-save.se
 import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FooterComponent } from '../components/footer/footer.component';
 import Swal from 'sweetalert2';
@@ -21,6 +22,11 @@ import { TableCheckerComponent } from '../components/table-checker/table-checker
 import { GenerateReportCommand } from 'app/application/survey/generate-report/generate-report.command';
 import { GenerateReportHandler } from 'app/application/survey/generate-report/generate-report.handler';
 import { ButtonModule } from 'primeng/button';
+import { SelectModule } from 'primeng/select';
+import { GetUserTrackingQuery } from 'app/application/auth/get-user-tracking/get-user-tracking.query';
+import { GetUserTrackingHandler } from 'app/application/auth/get-user-tracking/get-user-tracking.handler';
+import { IAuthRepository } from 'app/domain/auth/auth.repository';
+import { AuthRepository } from 'app/infrastructure/repositories/auth.repository';
 import {
   ScheduleYear,
   getActiveStageYear,
@@ -31,14 +37,17 @@ import { prepareDataForReport } from './report';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, 
+  imports: [CommonModule,
+    FormsModule,
     //FooterComponent, 
-    TableCheckerComponent, ButtonModule],
+    TableCheckerComponent, ButtonModule, SelectModule],
   providers: [
+    { provide: IAuthRepository, useClass: AuthRepository },
     { provide: ISurveyRepository, useClass: SurveyRepository },
     { provide: SaveStagePhaseCommand, useClass: SaveStagePhaseHandler },
     { provide: SaveConfigurationCommand, useClass: SaveConfigurationHandler },
     { provide: GenerateReportCommand, useClass: GenerateReportHandler },
+    { provide: GetUserTrackingQuery, useClass: GetUserTrackingHandler },
     LoadingService,
     ReportService,
   ],
@@ -47,6 +56,8 @@ import { prepareDataForReport } from './report';
 })
 export class HomeComponent implements OnInit {
   isLoadingDownload: boolean = false;
+  isRefreshing: boolean = false;
+  refreshVersion: number = 0;
   selectedScheduleYear: ScheduleYear = getActiveStageYear();
   yearAvailability: Record<ScheduleYear, boolean> = {
     '2025': false,
@@ -90,6 +101,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private _reportService: ReportService,
     private _GenerateReportCommand: GenerateReportCommand,
+    private _GetUserTrackingQuery: GetUserTrackingQuery,
   ) {}
 
   ngOnInit(): void {
@@ -99,6 +111,19 @@ export class HomeComponent implements OnInit {
 
   get hasDataForSelectedYear(): boolean {
     return !!this.yearAvailability[this.selectedScheduleYear];
+  }
+
+  get trackingYearOptions(): Array<{
+    year: ScheduleYear;
+    title: string;
+    description: string;
+    icon: string;
+    disabled: boolean;
+  }> {
+    return this.trackingYearCards.map((card) => ({
+      ...card,
+      disabled: !this.yearAvailability[card.year],
+    }));
   }
 
   selectScheduleYear(year: ScheduleYear) {
@@ -149,8 +174,71 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  async refresh() {
+    if (this.isRefreshing) {
+      return;
+    }
+
+    const userData = this.readStoredUserData();
+    if (!userData?.NUMERO_DOCUMENTO || !userData?.TIPO_INSTITUCION) {
+      Swal.fire({
+        text: 'No se pudo identificar la sesión para actualizar el tracking.',
+        icon: 'warning',
+      });
+      return;
+    }
+
+    this.isRefreshing = true;
+
+    try {
+      const payload = {
+        NUMERO_DOCUMENTO: String(userData.NUMERO_DOCUMENTO),
+        ID_TIPO_INSTITUCION: Number(userData.TIPO_INSTITUCION),
+      };
+
+      const response = await this._GetUserTrackingQuery.execute(payload);
+      const normalizedTracking = this.prepareTrackingDataByYear(response);
+
+      localStorage.setItem('dataTracking', JSON.stringify(normalizedTracking));
+
+      this.refreshYearAvailability();
+      this.ensureSelectedYearHasData();
+      this.refreshVersion += 1;
+
+      Swal.fire({
+        text: 'La información de tracking se actualizó correctamente.',
+        icon: 'success',
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error('Error al actualizar el tracking:', error);
+      Swal.fire({
+        text: 'No se pudo actualizar la información del tracking.',
+        icon: 'error',
+      });
+    } finally {
+      this.isRefreshing = false;
+    }
+  }
+
   private refreshYearAvailability() {
     this.yearAvailability = this.computeYearAvailability();
+  }
+
+  private readStoredUserData(): { NUMERO_DOCUMENTO?: string; TIPO_INSTITUCION?: number } | null {
+    const raw = localStorage.getItem('dataUser');
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.warn('No se pudo leer la sesión almacenada del usuario', error);
+      return null;
+    }
   }
 
   private computeYearAvailability(): Record<ScheduleYear, boolean> {
@@ -204,5 +292,45 @@ export class HomeComponent implements OnInit {
       this.selectedScheduleYear = fallback;
       setActiveStageYear(fallback);
     }
+  }
+
+  private prepareTrackingDataByYear(rawEntries: any): Record<ScheduleYear, any[]> {
+    const base = Array.isArray(rawEntries) ? rawEntries : [];
+    return {
+      '2025': base.map((entry) =>
+        this.stripPhaseFieldsOutsideRange(entry, { min: 1, max: 5 }),
+      ),
+      '2026': base.map((entry) =>
+        this.stripPhaseFieldsOutsideRange(entry, { min: 6, max: 10 }),
+      ),
+    };
+  }
+
+  private stripPhaseFieldsOutsideRange(
+    entry: any,
+    rule: { min: number; max: number },
+  ): any {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      return entry;
+    }
+
+    const sanitized = { ...entry };
+    Object.keys(sanitized).forEach((key) => {
+      const upperKey = key.toUpperCase();
+      const match = upperKey.match(/^FASE(\d+)_TAREA\d+$/);
+      if (!match) {
+        return;
+      }
+
+      const phaseNumber = Number(match[1]);
+      if (
+        Number.isFinite(phaseNumber) &&
+        (phaseNumber < rule.min || phaseNumber > rule.max)
+      ) {
+        delete sanitized[key];
+      }
+    });
+
+    return sanitized;
   }
 }

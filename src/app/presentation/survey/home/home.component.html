@@ -71,55 +71,42 @@
 
           } @else {
 
-            <!-- Tarjetas cronograma -->
+            <!-- Selector cronograma -->
             <div class="flex flex-col gap-6">
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                <p-card
-                  *ngFor="let card of scheduleCards"
-                  class="cursor-pointer transition-all duration-200 border border-transparent"
-                  [ngClass]="{
-                    'border-sky-600 shadow-lg bg-white': selectedScheduleYear === card.year,
-                    'bg-white/90 hover:-translate-y-1 hover:shadow-md': selectedScheduleYear !== card.year
-                  }"
-                  (click)="selectScheduleCard(card.year)"
+              <div class="flex flex-col gap-2 max-w-md">
+                <label class="text-sm font-medium text-slate-700">
+                  Selecciona el año del cronograma
+                </label>
+                <p-select
+                  [options]="scheduleCards"
+                  [ngModel]="selectedScheduleYear"
+                  (ngModelChange)="selectScheduleCard($event)"
+                  optionLabel="title"
+                  optionValue="year"
+                  placeholder="Selecciona un año"
+                  class="w-full"
+                  appendTo="body"
                 >
-
-                  <ng-template pTemplate="header">
-                    <div class="flex items-center justify-between gap-3">
-
+                  <ng-template let-card pTemplate="item">
+                    <div class="flex items-center justify-between gap-3 py-1 w-full">
                       <div class="flex items-center gap-2">
-                        <i
-                          class="pi text-2xl text-blue-500"
-                          [ngClass]="card.icon"
-                        ></i>
-
-                        <span class="text-lg font-semibold text-slate-900">
-                          {{ card.title }}
-                        </span>
+                        <i class="pi text-blue-500" [ngClass]="card.icon"></i>
+                        <div class="flex flex-col">
+                          <span class="font-medium text-slate-900">{{ card.title }}</span>
+                          <span class="text-xs text-slate-500">{{ card.description }}</span>
+                        </div>
                       </div>
-
-                      <span class="text-xs uppercase tracking-wide text-slate-500">
-                        {{ card.year }}
-                      </span>
-
+                      <span class="text-xs uppercase tracking-wide text-slate-500">{{ card.year }}</span>
                     </div>
                   </ng-template>
-
-                  <p class="text-sm text-slate-600 mt-2">
-                    {{ card.description }}
-                  </p>
-
-                  <ng-template pTemplate="footer">
-                    <div class="text-sm font-medium text-blue-600 flex items-center gap-2">
-                      <i class="pi pi-arrow-right"></i>
-                      Ver cronograma
+                  <ng-template let-card pTemplate="selectedItem">
+                    <div class="flex items-center gap-2" *ngIf="card">
+                      <i class="pi text-blue-500" [ngClass]="card.icon"></i>
+                      <span>{{ card.title }}</span>
                     </div>
                   </ng-template>
-
-                </p-card>
-
+                </p-select>
               </div>
 
               <!-- Switch cronogramas -->

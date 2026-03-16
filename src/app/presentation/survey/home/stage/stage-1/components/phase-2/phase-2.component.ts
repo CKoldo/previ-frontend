@@ -26,7 +26,7 @@ import { isSurveyEditMode } from 'app/shared/utils/survey-mode';
 
 @Component({
   selector: 'app-phase-2',
-  imports: [Quest1Component, CommentsComponent, CommonModule, ButtonsComponent,SkeletonSurveyComponent, UndoneTaskComponent],
+  imports: [Quest1Component, CommentsComponent, CommonModule, ButtonsComponent, SkeletonSurveyComponent, UndoneTaskComponent],
   providers: [
     { provide: ISurveyRepository, useClass: SurveyRepository },
     { provide: SaveStagePhaseCommand, useClass: SaveStagePhaseHandler },
@@ -66,25 +66,25 @@ export class Phase2Component {
     private _UpdateConfigurationCommand: UpdateConfigurationCommand,
     private _GetSurveyDataQuery: GetSurveyDataQuery,
     private _TemporalSaveService: TemporalSaveService,
-    private _UpdateStagePhaseCommand:UpdateStagePhaseCommand,
+    private _UpdateStagePhaseCommand: UpdateStagePhaseCommand,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.getDataSaved();
-      this._TemporalSaveService.dataNoTarea$.subscribe(data => {
-        this.tareaImplementada = data;
-      this.question=data?1:2;
+    this._TemporalSaveService.dataNoTarea$.subscribe(data => {
+      this.tareaImplementada = data;
+      this.question = data ? 1 : 2;
     });
   }
 
   showComments(): boolean {
-  return this.question == 2 && this.tareaImplementada;
-}
+    return this.question == 2 && this.tareaImplementada;
+  }
 
-showUndoneTask(): boolean {
-  return this.question == 2 && !this.tareaImplementada;
-}
+  showUndoneTask(): boolean {
+    return this.question == 2 && !this.tareaImplementada;
+  }
 
   ngOnDestroy() {
     this.destroy$.next(); // Emite un valor para finalizar las suscripciones
@@ -102,32 +102,32 @@ showUndoneTask(): boolean {
 
     const currentViewChild = stagePhaseMap[step];
 
-  if (currentViewChild) {
+    if (currentViewChild) {
       const isValid = currentViewChild.validateDataSave();
 
-      if(!isValid){
+      if (!isValid) {
         Swal.fire({
           text: 'Para continuar, completa todos los campos y verifica que la información sea válida.',
           icon: 'warning',
         });
         return;
-      }else{
+      } else {
         const item = await this._TemporalSaveService
-        .getCurrentQuestionTemp()
-        .pipe(take(1))
-        .toPromise();
+          .getCurrentQuestionTemp()
+          .pipe(take(1))
+          .toPromise();
 
-      if (item) {
-        const existingDataIndex = item.findIndex(
-          (item: any) => item.question === step
-        );
-        if (existingDataIndex > -1) {
-          item[existingDataIndex].answer = currentViewChild.getDataSave();
+        if (item) {
+          const existingDataIndex = item.findIndex(
+            (item: any) => item.question === step
+          );
+          if (existingDataIndex > -1) {
+            item[existingDataIndex].answer = currentViewChild.getDataSave();
+          }
         }
-      }
-      this._TemporalSaveService.saveCurrentQuestionTemp(item);
+        this._TemporalSaveService.saveCurrentQuestionTemp(item);
 
-    this.question++;
+        this.question++;
       }
 
 
@@ -156,7 +156,7 @@ showUndoneTask(): boolean {
       return null;
     }
 
-      const isValidInfoImplem=await this.validateDataInformationImplementation();
+    const isValidInfoImplem = await this.validateDataInformationImplementation();
     if (!isValidInfoImplem?.fechaModalidad) {
       Swal.fire({
         html: 'No se puede continuar sin completar todos los campos requeridos en la información de la implementación,<span style="color:red;font-weight:bold">falta ingresar fecha de implementación</span>',
@@ -164,7 +164,7 @@ showUndoneTask(): boolean {
       });
       return null;
     }
-   if (isValidInfoImplem?.modalidad === null || isValidInfoImplem?.modalidad === undefined) {
+    if (isValidInfoImplem?.modalidad === null || isValidInfoImplem?.modalidad === undefined) {
       Swal.fire({
         html: 'No se puede continuar sin completar todos los campos requeridos en la información de la implementación,<span style="color:red;font-weight:bold"> falta seleccionar la modalidad</span>',
         icon: 'warning',
@@ -188,8 +188,8 @@ showUndoneTask(): boolean {
     const existingDataIndex = temporalData.findIndex((item: any) => item.question === step);
     if (existingDataIndex > -1) {
       let saveData: any = currentViewChild.getDataSave();
-      this.archivoActa = saveData?.archivoActa??'';
-      this.archivoFoto = saveData?.archivoFoto??'';
+      this.archivoActa = saveData?.archivoActa ?? '';
+      this.archivoFoto = saveData?.archivoFoto ?? '';
       delete saveData.archivoActa;
       delete saveData.archivoFoto;
       temporalData[existingDataIndex].answer = saveData;
@@ -208,45 +208,46 @@ showUndoneTask(): boolean {
 
     const dataUser: any = localStorage.getItem('dataUser');
     let numeroDocumento = '';
-    let codigoLocal='';
-    if(dataUser){
+    let codigoLocal = '';
+    if (dataUser) {
       numeroDocumento = JSON.parse(dataUser)?.NUMERO_DOCUMENTO;
       codigoLocal = JSON.parse(dataUser)?.CODIGO_LOCAL;
     }
 
     const temporalDataInformationImplementation = await this._TemporalSaveService
-    .getDataInformationImplementation()
-    .pipe(take(1))
-    .toPromise();
+      .getDataInformationImplementation()
+      .pipe(take(1))
+      .toPromise();
 
     const objLog = {
       NUMERO_DOCUMENTO: numeroDocumento,
-      CODIGO_LOCAL:codigoLocal,
+      CODIGO_LOCAL: codigoLocal,
       FASE: this.stage,
       TAREA: this.phase,
       DATOS_JSON: JSON.stringify(temporalData),
-      ARCHIVO_ACTA: this.archivoActa??'',
-      ARCHIVO_EVIDENCIA: this.archivoFoto??'',
+      ARCHIVO_ACTA: this.archivoActa ?? '',
+      ARCHIVO_EVIDENCIA: this.archivoFoto ?? '',
       FECHA_MODALIDAD: temporalDataInformationImplementation.fechaModalidad,
       MODALIDAD: temporalDataInformationImplementation.modalidad,
-      REGISTRA_TAREA:this.tareaImplementada,
+      REGISTRA_TAREA: this.tareaImplementada,
       YEAR: stageYear
     };
 
     const objLogConfiguration = {
       DATOS_JSON: JSON.stringify(temporalData),
-      ARCHIVO_ACTA: this.archivoActa?this.archivoActa.name:'',
-      ARCHIVO_EVIDENCIA: this.archivoFoto?this.archivoFoto.name:'',
+      ARCHIVO_ACTA: this.archivoActa ? this.archivoActa.name : '',
+      ARCHIVO_EVIDENCIA: this.archivoFoto ? this.archivoFoto.name : '',
       FECHA_MODALIDAD: temporalDataInformationImplementation.fechaModalidad,
       MODALIDAD: temporalDataInformationImplementation.modalidad,
-      REGISTRA_TAREA:this.tareaImplementada,
+      REGISTRA_TAREA: this.tareaImplementada,
       YEAR: stageYear
     }
 
-    let esTareaNoImplementada= temporalDataInformationImplementation?.esTareaNoImplementada || false;
+
+    let esTareaNoImplementada = temporalDataInformationImplementation?.esTareaNoImplementada || false;
 
     try {
-      const result: any = await  (this.isCompletePhase?this._UpdateStagePhaseCommand.execute(objLog): this._SaveStagePhaseCommand.execute(objLog));
+      const result: any = await (this.isCompletePhase ? this._UpdateStagePhaseCommand.execute(objLog) : this._SaveStagePhaseCommand.execute(objLog));
       if (result) {
         stages.map((stage: any) => {
           if (stage.stage == this.stage) {
@@ -273,7 +274,7 @@ showUndoneTask(): boolean {
         text: 'Ha ocurrido un error al guardar los datos',
         icon: 'error',
       }).then((result: any) => {
-      Swal.close();
+        Swal.close();
       })
       return false;
     }
@@ -281,7 +282,7 @@ showUndoneTask(): boolean {
   }
 
   public async finishSurvey(step: number) {
-    const temporalData = await this.validateAndSaveCurrentViewChild(step,   this.tareaImplementada ? this.CommentsComponent : this.UndoneTaskComponent);
+    const temporalData = await this.validateAndSaveCurrentViewChild(step, this.tareaImplementada ? this.CommentsComponent : this.UndoneTaskComponent);
     if (!temporalData) return;
 
     Swal.fire({
@@ -303,7 +304,7 @@ showUndoneTask(): boolean {
         const isSaved = await this.saveSurveyData(temporalData);
 
         if (isSaved) {
-          const saveStage=await this.saveDateStagePhase();
+          const saveStage = await this.saveDateStagePhase();
           Swal.close();
           return this.alertfinishSurvey();
         }
@@ -316,166 +317,166 @@ showUndoneTask(): boolean {
     window.location.href = '/auth/sign-in';
   }
 
-    alertfinishSurvey() {
-      Swal.fire({
-        title: 'Tarea completada',
-        text: 'Gracias por participar',
-        icon: 'success',
-        confirmButtonColor: '#22c55e',
-        confirmButtonText: 'Continuar',
-      }).then(() => {
-        this.GoToSelectStage();
-      });
-    }
+  alertfinishSurvey() {
+    Swal.fire({
+      title: 'Tarea completada',
+      text: 'Gracias por participar',
+      icon: 'success',
+      confirmButtonColor: '#22c55e',
+      confirmButtonText: 'Continuar',
+    }).then(() => {
+      this.GoToSelectStage();
+    });
+  }
 
-    GoToSelectStage() {
-      if (isSurveyEditMode()) {
-        return;
+  GoToSelectStage() {
+    if (isSurveyEditMode()) {
+      return;
+    }
+    this.router.navigate(['/']).then(() => {
+      this.router.navigate(['/survey']);
+    });
+  }
+
+  async validateDataInformationImplementation() {
+    try {
+
+      const data = await firstValueFrom(
+        this._TemporalSaveService.getDataInformationImplementation().pipe(take(1))
+      );
+
+      if (!data) {
+        return false;
       }
-      this.router.navigate(['/']).then(() => {
-        this.router.navigate(['/survey']);
-      });
-    }
-
-    async validateDataInformationImplementation() {
-      try {
-
-        const data = await firstValueFrom(
-          this._TemporalSaveService.getDataInformationImplementation().pipe(take(1))
-        );
-
-        if (!data) {
-          return false;
-        }
 
       //    if(data?.esTareaNoImplementada){
       //   return data?.fechaModalidad != null && data?.modalidad != null && data?.extraInfo;
       // }
 
-        return data;
-      } catch (error) {
-        console.error('Error al validar la información de implementación:', error);
-        return false;
-      }
+      return data;
+    } catch (error) {
+      console.error('Error al validar la información de implementación:', error);
+      return false;
     }
+  }
 
-    async saveDateStagePhase() {
-      try {
-        const dataUser: any = localStorage.getItem('dataUser');
-        let numeroDocumento = '';
-        let codigoLocal = '';
-        if (dataUser) {
-          numeroDocumento = JSON.parse(dataUser)?.NUMERO_DOCUMENTO;
-          codigoLocal = JSON.parse(dataUser)?.CODIGO_LOCAL;
-          let stage = localStorage.getItem('stage');
-          if (stage) {
-            const objSave = {
-              NUMERO_DOCUMENTO: numeroDocumento,
-              CODIGO_LOCAL: codigoLocal,
-              DATOS_JSON: stage,
-            }
-            let result = await (dataUser?.REGISTRADO ? this._UpdateConfigurationCommand.execute(objSave) : this._SaveConfigurationCommand.execute(objSave));
-            if (result) {
-              console.log(
-                'Se guardo correctamente la configuracion de la encuesta'
-              );
-            }
+  async saveDateStagePhase() {
+    try {
+      const dataUser: any = localStorage.getItem('dataUser');
+      let numeroDocumento = '';
+      let codigoLocal = '';
+      if (dataUser) {
+        numeroDocumento = JSON.parse(dataUser)?.NUMERO_DOCUMENTO;
+        codigoLocal = JSON.parse(dataUser)?.CODIGO_LOCAL;
+        let stage = localStorage.getItem('stage');
+        if (stage) {
+          const objSave = {
+            NUMERO_DOCUMENTO: numeroDocumento,
+            CODIGO_LOCAL: codigoLocal,
+            DATOS_JSON: stage,
+          }
+          let result = await (dataUser?.REGISTRADO ? this._UpdateConfigurationCommand.execute(objSave) : this._SaveConfigurationCommand.execute(objSave));
+          if (result) {
+            console.log(
+              'Se guardo correctamente la configuracion de la encuesta'
+            );
           }
         }
-
-
-
-      } catch (error) {
-        console.error('Error al guardar la configuración de la encuesta:', error);
       }
+
+
+
+    } catch (error) {
+      console.error('Error al guardar la configuración de la encuesta:', error);
     }
+  }
 
-    async getDataSaved() {
-      try {
-        this.isLoading = true;
+  async getDataSaved() {
+    try {
+      this.isLoading = true;
 
-        const dataUser = localStorage.getItem('dataUser');
-        const savedStage = localStorage.getItem('stage');
+      const dataUser = localStorage.getItem('dataUser');
+      const savedStage = localStorage.getItem('stage');
 
-        if (!dataUser || !savedStage) return;
-        
-        const { NUMERO_DOCUMENTO: numeroDocumento, CODIGO_LOCAL: codigoLocal } = JSON.parse(dataUser);
-        const stages = JSON.parse(savedStage);
+      if (!dataUser || !savedStage) return;
 
-        const currentStage = stages.find((s: any) => s.stage === this.stage);
-        if (!currentStage) return;
+      const { NUMERO_DOCUMENTO: numeroDocumento, CODIGO_LOCAL: codigoLocal } = JSON.parse(dataUser);
+      const stages = JSON.parse(savedStage);
 
-        const currentSurvey = currentStage.survey.find((survey: any) => survey.survey === `${this.stage}-${this.phase}`);
-        if (!currentSurvey) return;
+      const currentStage = stages.find((s: any) => s.stage === this.stage);
+      if (!currentStage) return;
 
-        const objParam = {
-          CODIGO_LOCAL: codigoLocal,
-          NUMERO_DOCUMENTO: numeroDocumento,
-          FASE: this.stage,
-          TAREA: this.phase,
-        };
+      const currentSurvey = currentStage.survey.find((survey: any) => survey.survey === `${this.stage}-${this.phase}`);
+      if (!currentSurvey) return;
 
-        const response = await this._GetSurveyDataQuery.execute(objParam);
-        if (!response) return;
-
-        let dataResp = response.result[0];
-
-        dataResp={
-          ...dataResp,
-          ARCHIVO_ACTA_NAME: currentSurvey.dataSaved?.ARCHIVO_ACTA??'',
-          ARCHIVO_EVIDENCIA_NAME: currentSurvey.dataSaved?.ARCHIVO_EVIDENCIA??''
-        }
-
-        const info = dataResp?.DATOS_JSON;
-
-        this.fillQuestionAnswer(dataResp, info);
-      } catch (error) {
-        if ((error as any)?.message) {
-          console.error('Error al obtener los datos guardados:', (error as any)?.error?.message);
-        }
-      } finally {
-        this.isLoading = false;
-        this.isLoadingInformation.emit(false);
-      }
-    }
-    fillQuestionAnswer(data: any, respuesta: any) {
-      let objImplementacion:any={
-        fechaModalidad: data.FECHA_MODALIDAD,
-        modalidad: data.MODALIDAD,
-        tareaImplementada:data.REGISTRA_TAREA
+      const objParam = {
+        CODIGO_LOCAL: codigoLocal,
+        NUMERO_DOCUMENTO: numeroDocumento,
+        FASE: this.stage,
+        TAREA: this.phase,
       };
-       this.tareaImplementada= data.REGISTRA_TAREA;
-      this.question=data.REGISTRA_TAREA?1:2;
-      let arrPreguntas:any=JSON.parse(respuesta);
-      this.archivoName = null;
-    if(data.REGISTRA_TAREA){
-    this.archivoName = {
-      archivoActa: {
-        name: data.ARCHIVO_ACTA&&!data.ARCHIVO_ACTA_NAME?"acta.pdf":data.ARCHIVO_ACTA_NAME,
-        file: data.ARCHIVO_ACTA
-      },
-      archivoFoto: {
-        name: data.ARCHIVO_EVIDENCIA&&!data.ARCHIVO_EVIDENCIA_NAME?"evidencia.jpg":data.ARCHIVO_EVIDENCIA_NAME,
-        file: data.ARCHIVO_EVIDENCIA
+
+      const response = await this._GetSurveyDataQuery.execute(objParam);
+      if (!response) return;
+
+      let dataResp = response.result[0];
+
+      dataResp = {
+        ...dataResp,
+        ARCHIVO_ACTA_NAME: currentSurvey.dataSaved?.ARCHIVO_ACTA ?? '',
+        ARCHIVO_EVIDENCIA_NAME: currentSurvey.dataSaved?.ARCHIVO_EVIDENCIA ?? ''
       }
+
+      const info = dataResp?.DATOS_JSON;
+
+      this.fillQuestionAnswer(dataResp, info);
+    } catch (error) {
+      if ((error as any)?.message) {
+        console.error('Error al obtener los datos guardados:', (error as any)?.error?.message);
+      }
+    } finally {
+      this.isLoading = false;
+      this.isLoadingInformation.emit(false);
+    }
+  }
+  fillQuestionAnswer(data: any, respuesta: any) {
+    let objImplementacion: any = {
+      fechaModalidad: data.FECHA_MODALIDAD,
+      modalidad: data.MODALIDAD,
+      tareaImplementada: data.REGISTRA_TAREA
     };
+    this.tareaImplementada = data.REGISTRA_TAREA;
+    this.question = data.REGISTRA_TAREA ? 1 : 2;
+    let arrPreguntas: any = JSON.parse(respuesta);
+    this.archivoName = null;
+    if (data.REGISTRA_TAREA) {
+      this.archivoName = {
+        archivoActa: {
+          name: data.ARCHIVO_ACTA && !data.ARCHIVO_ACTA_NAME ? "acta.pdf" : data.ARCHIVO_ACTA_NAME,
+          file: data.ARCHIVO_ACTA
+        },
+        archivoFoto: {
+          name: data.ARCHIVO_EVIDENCIA && !data.ARCHIVO_EVIDENCIA_NAME ? "evidencia.jpg" : data.ARCHIVO_EVIDENCIA_NAME,
+          file: data.ARCHIVO_EVIDENCIA
+        }
+      };
     }
 
-      if(Object.keys(arrPreguntas).length>0){
-        this.objQuestion={};
-        arrPreguntas.map((pregunta:any)=>{
-          this.objQuestion[pregunta.question]=pregunta.answer;
+    if (Object.keys(arrPreguntas).length > 0) {
+      this.objQuestion = {};
+      arrPreguntas.map((pregunta: any) => {
+        this.objQuestion[pregunta.question] = pregunta.answer;
       });
 
       console.log(this.objQuestion);
 
 
-      }
-      this._TemporalSaveService.setDataInformationImplementation(objImplementacion);
-      this.isCompletePhase=true;
-      //this.isUpdateEnable = !this.isAllStagesCompleted;
-      // if(this.isUpdateEnable){
-      //   this.archivoName = null;
-      // }
-     }
+    }
+    this._TemporalSaveService.setDataInformationImplementation(objImplementacion);
+    this.isCompletePhase = true;
+    //this.isUpdateEnable = !this.isAllStagesCompleted;
+    // if(this.isUpdateEnable){
+    //   this.archivoName = null;
+    // }
+  }
 }

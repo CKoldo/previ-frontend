@@ -43,6 +43,7 @@ import { ScheduleYear } from 'app/shared/utils/stage-storage.util';
 })
 export class TableCheckerComponent implements OnInit, OnChanges {
   @Input() scheduleYear: ScheduleYear = '2025';
+  @Input() refreshToken: number = 0;
   arrayTabla: any[] = [];
   phaseHeaders: any[] = [];
   listaIEs: any = [];
@@ -78,6 +79,11 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     if (changes['scheduleYear'] && !changes['scheduleYear'].firstChange) {
       this.buildStructureTable();
       this.phaseHeaders = this.getPhaseHeaders();
+      this.syncTableData();
+      return;
+    }
+
+    if (changes['refreshToken'] && !changes['refreshToken'].firstChange) {
       this.syncTableData();
     }
   }

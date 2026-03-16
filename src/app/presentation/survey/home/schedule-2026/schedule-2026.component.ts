@@ -23,34 +23,34 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrl: './schedule-2026.component.css',
 })
 export class Schedule2026Component {
-    formatDate(dateStr: string): string {
-      if (!dateStr) return '';
-      // Si el string tiene formato ISO, extrae los primeros 10 caracteres
-      // Ejemplo: 2026-04-01T00:00:00.000Z => 2026-04-01
-      const iso = dateStr.slice(0, 10);
-      const [year, month, day] = iso.split('-');
-      if (year && month && day) return `${year}/${month}/${day}`;
-      return '';
-    }
+  formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    // Si el string tiene formato ISO, extrae los primeros 10 caracteres
+    // Ejemplo: 2026-04-01T00:00:00.000Z => 2026-04-01
+    const iso = dateStr.slice(0, 10);
+    const [year, month, day] = iso.split('-');
+    if (year && month && day) return `${year}/${month}/${day}`;
+    return '';
+  }
   @Output() selectedStage = new EventEmitter<any>();
 
-  stages:any=[];
+  stages: any = [];
   public enableDates: any = {};
   private static readonly DISABLED_SURVEYS_BY_STAGE: Record<number, number[]> = {
     1: [5],
-    4: [4,5],
+    4: [4, 5],
   };
 
   constructor() {
-   this.setStage();
+    this.setStage();
   }
 
   getProgressBarStyle(stage_2026: any): string {
-    if(!stage_2026.enable){
+    if (!stage_2026.enable) {
       return 'background: #e4e4e7';
     }
 
-    const filSur= stage_2026.survey.filter((s: any) => s.enable && s);
+    const filSur = stage_2026.survey.filter((s: any) => s.enable && s);
 
     const completedPercentage = (filSur.filter((s: any) => s.complete && s).length / filSur.length) * 100;
     if (completedPercentage <= 0) {
@@ -74,7 +74,7 @@ export class Schedule2026Component {
     this.selectedStage.emit(objStage);
   }
 
-  setStage(){
+  setStage() {
     const savedStage = localStorage.getItem('stage');
     let cnfSchd = ConfigSurvey.SCHEDULE_CONFIG;
     let stagesData = savedStage ? JSON.parse(savedStage) : cnfSchd;
@@ -147,11 +147,11 @@ export class Schedule2026Component {
     });
     const shouldForceStageOne = enableDatesArr.length === 0;
     let stages = stagesData.map((stage: any) => {
-      const found = enableDatesArr.find((e: any) => e.stage == stage.stage +5);
+      const found = enableDatesArr.find((e: any) => e.stage == stage.stage + 5);
       if (found) {
         return {
           ...stage,
-          enable:found.enable
+          enable: found.enable
         };
       }
       return {
@@ -163,8 +163,8 @@ export class Schedule2026Component {
     localStorage.setItem('stage', JSON.stringify(this.stages));
   }
 
-  refreshStage(){
-    this.stages=[];
+  refreshStage() {
+    this.stages = [];
     this.setStage();
   }
 

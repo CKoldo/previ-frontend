@@ -213,6 +213,9 @@ if (isValidInfoImplem?.modalidad === null || isValidInfoImplem?.modalidad === un
   private async saveSurveyData(temporalData: any): Promise<boolean> {
     const savedStage: any = localStorage.getItem('stage');
     if (!savedStage) return false;
+    const stages = JSON.parse(savedStage);
+    const currentStageConfig = stages.find((stage: any) => stage.stage == this.stage);
+    const stageYear = currentStageConfig?.YEAR ?? currentStageConfig?.year ?? '2025';
 
     const dataUser: any = localStorage.getItem('dataUser');
     let numeroDocumento = '';
@@ -237,7 +240,8 @@ if (isValidInfoImplem?.modalidad === null || isValidInfoImplem?.modalidad === un
       ARCHIVO_EVIDENCIA: this.archivoFoto??'',
       FECHA_MODALIDAD: temporalDataInformationImplementation.fechaModalidad,
       MODALIDAD: temporalDataInformationImplementation.modalidad,
-        REGISTRA_TAREA:this.tareaImplementada
+        REGISTRA_TAREA:this.tareaImplementada,
+      YEAR: stageYear
     };
 
     const objLogConfiguration = {
@@ -246,7 +250,8 @@ if (isValidInfoImplem?.modalidad === null || isValidInfoImplem?.modalidad === un
       ARCHIVO_EVIDENCIA: this.archivoFoto?this.archivoFoto.name:'',
       FECHA_MODALIDAD: temporalDataInformationImplementation.fechaModalidad,
       MODALIDAD: temporalDataInformationImplementation.modalidad,
-        REGISTRA_TAREA:this.tareaImplementada
+        REGISTRA_TAREA:this.tareaImplementada,
+      YEAR: stageYear
     }
 
     let esTareaNoImplementada= temporalDataInformationImplementation?.esTareaNoImplementada || false;
@@ -254,7 +259,6 @@ if (isValidInfoImplem?.modalidad === null || isValidInfoImplem?.modalidad === un
     try {
       const result: any = await  (this.isCompletePhase?this._UpdateStagePhaseCommand.execute(objLog): this._SaveStagePhaseCommand.execute(objLog));
       if (result) {
-        let stages = JSON.parse(savedStage);
         stages.map((stage: any) => {
           if (stage.stage == this.stage) {
             stage.survey.map((survey: any) => {
