@@ -1353,7 +1353,7 @@ export class ConfigSurvey {
         {
           label: 'Tarea 2',
           survey: '5-2',
-          enable: true,
+          enable: false,
           complete: false,
           prevComplete: false,
           countQuestion: 2,
@@ -1362,7 +1362,7 @@ export class ConfigSurvey {
         {
           label: 'Tarea 3',
           survey: '5-3',
-          enable: true,
+          enable: false,
           complete: false,
           prevComplete: false,
           countQuestion: 2,
@@ -1371,7 +1371,7 @@ export class ConfigSurvey {
         {
           label: 'Tarea 4',
           survey: '5-4',
-          enable: true,
+          enable: false,
           complete: false,
           prevComplete: false,
           countQuestion: 3,
@@ -1380,7 +1380,7 @@ export class ConfigSurvey {
         {
           label: 'Tarea 5',
           survey: '5-5',
-          enable: true,
+          enable: false,
           complete: false,
           prevComplete: false,
           countQuestion: 4,

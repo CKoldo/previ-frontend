@@ -24,6 +24,9 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class ScheduleComponent {
   @Output() selectedStage = new EventEmitter<any>();
+  private static readonly DISABLED_SURVEYS_BY_STAGE: Record<number, number[]> = {
+    5: [2, 3, 4],
+  };
 
   stages:any=[];
 
@@ -105,6 +108,8 @@ export class ScheduleComponent {
       };
     });
 
+    stagesData = this.applyDisabledSurveys(stagesData);
+
 
     const saveStageEnable = localStorage.getItem('dataStageEnable');
     let enableDates: any[] = [];
@@ -134,5 +139,35 @@ export class ScheduleComponent {
   refreshStage(){
     this.stages=[];
     this.setStage();
+  }
+
+  private applyDisabledSurveys(stages: any[]): any[] {
+    return stages.map((stage: any) => {
+      const disabledTasks = ScheduleComponent.DISABLED_SURVEYS_BY_STAGE[Number(stage.stage)] ?? [];
+      if (!disabledTasks.length || !Array.isArray(stage.survey)) {
+        return stage;
+      }
+
+      const updatedSurvey = stage.survey.map((survey: any) => {
+        const surveyId = typeof survey?.survey === 'string' ? survey.survey : '';
+        const [, taskSegment] = surveyId.split('-');
+        const taskNumber = Number(taskSegment);
+        if (!taskSegment || !disabledTasks.includes(taskNumber)) {
+          return survey;
+        }
+
+        return {
+          ...survey,
+          enable: false,
+          prevComplete: false,
+          complete: false
+        };
+      });
+
+      return {
+        ...stage,
+        survey: updatedSurvey
+      };
+    });
   }
 }

@@ -30,7 +30,7 @@
               'mb-4': stage.survey[stage.survey.length - 1] === survey
             }" (click)="
             selectStage(survey.survey, survey.countQuestion)
-            " *ngIf="stage.enable">
+            " *ngIf="stage.enable && survey.enable">
             <div class="flex flex-col">
               <span class="block text-sm font-bold">
                 <i class="pi text-sm mt-0.5 mr-1" [ngClass]="{
@@ -42,6 +42,21 @@
               }}</span> -->
             </div>
             <i class="pi pi-check" *ngIf="survey.complete"></i>
+          </div>
+          <div
+            class="flex justify-between items-center bg-gray-100! text-gray-500! rounded px-3 py-6 mt-3 border-l-blue-500 transition duration-300 ease-in-out border h-20 hover:shadow-none! cursor-not-allowed! border-gray-200! border-l-1!"
+            [ngClass]="{
+              'mb-4': stage.survey[stage.survey.length - 1] === survey
+            }" *ngIf="stage.enable && !survey.enable">
+            <div class="flex flex-col">
+              <span class="block text-sm font-bold">
+                <i class="pi text-sm mt-0.5 mr-1" [ngClass]="{
+                    'pi-bookmark': !survey.complete,
+                    'pi-bookmark-fill': survey.complete
+                  }"></i>{{ survey.label }}</span>
+              <span class="text-xs text-gray-500">Se habilitará próximamente</span>
+            </div>
+            <i class="pi pi-lock"></i>
           </div>
           <div
             class="flex justify-between items-center bg-gray-100! text-gray-500! rounded px-3 py-6 mt-3 border-l-blue-500  transition duration-300 ease-in-out border h-20 hover:shadow-none! cursor-not-allowed! border-gray-200! border-l-1!"
