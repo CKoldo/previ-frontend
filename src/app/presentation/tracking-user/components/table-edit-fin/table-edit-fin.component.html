@@ -31,10 +31,15 @@
         </select>
       </div>
 
-      <table *ngIf="selectedYear !== null && visibleRows.length; else yearSelectionState">
+      <table
+        *ngIf="
+          selectedYear !== null && visibleRows.length;
+          else yearSelectionState
+        "
+      >
         <thead>
           <tr>
-            <th colspan="3" class="table-edit__title">
+            <th colspan="4" class="table-edit__title">
               Cronograma de fases para el año {{ selectedYear }}
             </th>
           </tr>
@@ -43,21 +48,24 @@
           <tr>
             <th>Fase</th>
             <th>Estado de la fase</th>
-            <th></th>
+            <th>Rango de fechas</th>
+            <th class="col-span-2"></th>
           </tr>
         </thead>
 
         <tbody>
           <tr *ngFor="let row of visibleRows">
+            <!--Fase-->
             <td>
               <div class="table-edit__stage">
+                <!--
                 <span class="table-edit__stage-badge"
                   >Fase {{ row.stage }}</span
-                >
+              -->
                 <strong>{{ row.labelStage }}</strong>
               </div>
             </td>
-
+            <!--Estado-->
             <td>
               <div class="table-edit__toggle">
                 <label class="toggle-switch">
@@ -76,18 +84,33 @@
                 </span>
               </div>
             </td>
+            <!--Rango de fechas-->
+            <td>
+              <div class="table-edit__stage">
+                <h2>{{ row.start }} - {{ row.end }}</h2>
+              </div>
+            </td>
 
+            <!--Acciones-->
             <td class="table-edit__actions">
               <button
                 type="button"
+                [disabled]="savingStage === row.stage || savingDateStage === row.stage"
+                (click)="editRow(row)"
+                class="pi pi-calendar mr-2">
+                  {{ savingDateStage === row.stage ? "Guardando fechas..." : "Editar fechas" }}
+              </button>
+              <button
+                type="button"
                 (click)="saveRow(row)"
-                [disabled]="savingStage === row.stage"
+                [disabled]="savingStage === row.stage || savingDateStage === row.stage"
               >
                 {{
                   savingStage === row.stage ? "Guardando..." : "Guardar estado"
                 }}
               </button>
             </td>
+
           </tr>
         </tbody>
       </table>
@@ -121,3 +144,68 @@
     </ng-template>
   </div>
 </ng-template>
+
+<p-dialog
+  [(visible)]="dateDialogVisible"
+  [modal]="true"
+  [dismissableMask]="savingDateStage === null"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="savingDateStage === null"
+  [style]="{ width: 'min(32rem, 92vw)' }"
+  header="Editar rango de fechas"
+  (onHide)="closeDateDialog()"
+>
+  <div class="table-edit__dialog" *ngIf="selectedDateRow as row">
+    <p class="table-edit__dialog-text">
+      Actualice las fechas para <strong>{{ row.labelStage }}</strong>.
+    </p>
+
+    <div class="table-edit__dialog-grid">
+      <label class="table-edit__dialog-field">
+        <span>Fecha de inicio</span>
+        <input
+          type="date"
+          [(ngModel)]="dateForm.start"
+          name="date-start"
+        />
+      </label>
+
+      <label class="table-edit__dialog-field">
+        <span>Fecha de fin</span>
+        <input
+          type="date"
+          [(ngModel)]="dateForm.end"
+          name="date-end"
+        />
+      </label>
+    </div>
+
+    <p class="table-edit__dialog-feedback" *ngIf="dateValidationMessage as message">
+      {{ message }}
+    </p>
+
+    <p class="table-edit__dialog-feedback" *ngIf="!dateValidationMessage && !hasDateChanges">
+      Modifique al menos una fecha para habilitar el guardado.
+    </p>
+
+    <div class="table-edit__dialog-actions">
+      <button
+        type="button"
+        class="btn ghost"
+        (click)="closeDateDialog()"
+        [disabled]="savingDateStage !== null"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn ghost"
+        (click)="saveDates()"
+        [disabled]="savingDateStage !== null || !canSaveDates"
+      >
+        {{ savingDateStage === row.stage ? "Guardando..." : "Guardar fechas" }}
+      </button>
+    </div>
+  </div>
+</p-dialog>

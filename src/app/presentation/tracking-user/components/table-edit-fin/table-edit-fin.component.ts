@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
 import Swal from 'sweetalert2';
 
 import { GetScheduleDatesHandler } from 'app/application/survey/get-schedule-dates/get-schedule-dates.handler';
+import { UpdateScheduleDatesHandler } from 'app/application/survey/update-schedule-dates/update-schedule-dates.handler';
 import { UpdateStageStatusHandler } from 'app/application/survey/update-stage-status/update-stage-status.handler';
 import { ISurveyRepository } from 'app/domain/survey/survey.repository';
 import { SurveyRepository } from 'app/infrastructure/repositories/survey.repository';
@@ -25,6 +27,11 @@ interface StageEnableRow {
   enable: boolean;
 }
 
+interface StageDateForm {
+  start: string;
+  end: string;
+}
+
 interface YearOption {
   year: number;
   start: number;
@@ -34,7 +41,7 @@ interface YearOption {
 @Component({
   selector: 'app-table-edit-fin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DialogModule],
   templateUrl: './table-edit-fin.component.html',
   styleUrl: './table-edit-fin.component.css',
   providers: [{ provide: ISurveyRepository, useClass: SurveyRepository }],
@@ -42,8 +49,15 @@ interface YearOption {
 export class TableEditFinComponent implements OnInit {
   rows: StageEnableRow[] = [];
   savingStage: number | null = null;
+  savingDateStage: number | null = null;
   loading = false;
   selectedYear: number | null = null;
+  dateDialogVisible = false;
+  selectedDateRow: StageEnableRow | null = null;
+  dateForm: StageDateForm = {
+    start: '',
+    end: '',
+  };
   readonly yearOptions: YearOption[] = [
     { year: 2025, start: 0, end: 5 },
     { year: 2026, start: 5, end: 10 },
@@ -51,6 +65,7 @@ export class TableEditFinComponent implements OnInit {
 
   constructor(
     private readonly _getScheduleDates: GetScheduleDatesHandler,
+    private readonly _updateScheduleDates: UpdateScheduleDatesHandler,
     private readonly _updateStageStatus: UpdateStageStatusHandler,
     private readonly router: Router
   ) {}
@@ -76,12 +91,173 @@ export class TableEditFinComponent implements OnInit {
     return this.rows.slice(selectedOption.start, selectedOption.end);
   }
 
+  get hasDateChanges(): boolean {
+    const payload = this.getSelectedDatePayload();
+
+    if (!payload) {
+      return false;
+    }
+
+    return payload.row.start !== payload.start || payload.row.end !== payload.end;
+  }
+
+  get dateValidationMessage(): string | null {
+    const payload = this.getSelectedDatePayload();
+
+    if (!payload) {
+      return null;
+    }
+
+    const { row, start, end } = payload;
+
+    if (!start || !end) {
+      return 'Debe seleccionar la fecha de inicio y la fecha de fin.';
+    }
+
+    if (start > end) {
+      return 'La fecha de inicio no puede ser mayor que la fecha de fin.';
+    }
+
+    const nextRow = this.getNextRowInSameYear(row.stage);
+    if (nextRow && end >= nextRow.start) {
+      return `La fecha de fin debe ser menor que el inicio de la siguiente fase (${nextRow.labelStage}: ${nextRow.start}).`;
+    }
+
+    return null;
+  }
+
+  get canSaveDates(): boolean {
+    return this.hasDateChanges && !this.dateValidationMessage;
+  }
+
   goBack(): void {
     this.router.navigate(['/tracking-user']);
   }
 
+  editRow(row: StageEnableRow): void {
+    console.log('[TableEditFin] editRow dates', {
+      start: row.start,
+      end: row.end,
+    });
+
+    this.selectedDateRow = row;
+    this.dateForm = {
+      start: row.start,
+      end: row.end,
+    };
+    this.dateDialogVisible = true;
+  }
+
+  closeDateDialog(): void {
+    if (this.savingDateStage !== null) {
+      return;
+    }
+
+    this.resetDateDialogState();
+  }
+
+  private forceCloseDateDialog(): void {
+    this.resetDateDialogState();
+  }
+
+  private resetDateDialogState(): void {
+    this.dateDialogVisible = false;
+    this.selectedDateRow = null;
+    this.dateForm = {
+      start: '',
+      end: '',
+    };
+  }
+
+  async saveDates(): Promise<void> {
+    if (!this.selectedDateRow) {
+      return;
+    }
+
+    const row = this.selectedDateRow;
+    const start = this.normalizeDate(this.dateForm.start);
+    const end = this.normalizeDate(this.dateForm.end);
+    const validationMessage = this.dateValidationMessage;
+
+    if (!this.hasDateChanges) {
+      return;
+    }
+
+    if (validationMessage) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Rango inválido',
+        text: validationMessage,
+      });
+      return;
+    }
+
+    this.savingDateStage = row.stage;
+    this.forceCloseDateDialog();
+
+    Swal.fire({
+      title: 'Guardando fechas...',
+      text: 'Espere un momento.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      await this._updateScheduleDates.execute({
+        ID_FASE: row.stage,
+        FECHA_INICIO: start,
+        FECHA_FIN: end,
+        ES_ACTIVO: row.enable ? 1 : 0,
+      });
+
+      const updatedEntries: StageEnableEntry[] = this.rows.map((item) => ({
+        stage: item.stage,
+        enable: item.enable,
+        start: item.stage === row.stage ? start : item.start,
+        end: item.stage === row.stage ? end : item.end,
+      }));
+
+      this.persistEntries(updatedEntries);
+      this.rows = this.buildRows(updatedEntries);
+      await this.loadRowsFromServer(false);
+      Swal.close();
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Fechas actualizadas',
+        text: `El rango de ${row.labelStage} fue actualizado correctamente.`,
+        timer: 2200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error('No se pudo actualizar el rango de fechas', error);
+      Swal.close();
+      await Swal.fire({
+        icon: 'error',
+        title: 'No se pudo actualizar',
+        text: 'Intenta nuevamente en unos minutos.',
+      });
+      await this.loadRowsFromServer(false);
+    } finally {
+      this.savingDateStage = null;
+    }
+  }
+
   async saveRow(row: StageEnableRow): Promise<void> {
     this.savingStage = row.stage;
+
+    Swal.fire({
+      title: 'Guardando estado...',
+      text: 'Espere un momento.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
     try {
       const updateResult = await this._updateStageStatus.execute({
@@ -99,6 +275,7 @@ export class TableEditFinComponent implements OnInit {
       this.persistEntries(updatedEntries);
 
       await this.loadRowsFromServer(false);
+      Swal.close();
 
       Swal.fire({
         icon: 'success',
@@ -109,6 +286,7 @@ export class TableEditFinComponent implements OnInit {
       });
     } catch (error) {
       console.error('No se pudo actualizar la fase', error);
+      Swal.close();
       Swal.fire({
         icon: 'error',
         title: 'No se pudo guardar',
@@ -178,13 +356,57 @@ export class TableEditFinComponent implements OnInit {
     if (!value) {
       return '';
     }
-    const date = new Date(value);
+
+    const normalizedValue = String(value).trim();
+    const flatDateMatch = normalizedValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (flatDateMatch) {
+      const [, year, month, day] = flatDateMatch;
+      return `${year}-${month}-${day}`;
+    }
+
+    const date = new Date(normalizedValue);
     if (isNaN(date.getTime())) {
       return '';
     }
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${date.getFullYear()}-${month}-${day}`;
+
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${date.getUTCFullYear()}-${month}-${day}`;
+  }
+
+  private getSelectedDatePayload(): {
+    row: StageEnableRow;
+    start: string;
+    end: string;
+  } | null {
+    if (!this.selectedDateRow) {
+      return null;
+    }
+
+    return {
+      row: this.selectedDateRow,
+      start: this.normalizeDate(this.dateForm.start),
+      end: this.normalizeDate(this.dateForm.end),
+    };
+  }
+
+  private getNextRowInSameYear(stage: number): StageEnableRow | null {
+    const currentIndex = this.rows.findIndex((row) => row.stage === stage);
+
+    if (currentIndex === -1) {
+      return null;
+    }
+
+    const currentYearOption = this.yearOptions.find(
+      (option) => currentIndex >= option.start && currentIndex < option.end
+    );
+
+    if (!currentYearOption || currentIndex + 1 >= currentYearOption.end) {
+      return null;
+    }
+
+    return this.rows[currentIndex + 1] ?? null;
   }
 
   private mapApiResponseToEntries(
