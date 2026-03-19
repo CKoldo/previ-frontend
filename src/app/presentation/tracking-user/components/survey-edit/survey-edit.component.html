@@ -81,7 +81,11 @@
         <button type="button" class="btn ghost" (click)="clearSelection()">
           Limpiar
         </button>
-        <button type="submit" class="btn primary" [disabled]="isRecordLoading">
+        <button
+          type="submit"
+          class="btn primary"
+          [disabled]="isRecordLoading || form.invalid"
+        >
           {{ isRecordLoading ? "Buscando..." : "Cargar registro" }}
         </button>
       </div>

@@ -15,19 +15,27 @@
         </p>
       </div>
     </header>
-    <!--
-    <div class="survey-edit__actions" style="background-color: violet">
-      <button type="button" class="btn ghost" (click)="goBack()">
-        Regresar Home
-      </button>
-    </div>
-  -->
     <div class="table-edit__table-wrapper" *ngIf="rows.length; else emptyState">
-      <table>
+      <div class="table-edit__filters">
+        <label class="table-edit__filter-label" for="year-select">Año</label>
+        <select
+          id="year-select"
+          class="table-edit__select"
+          [(ngModel)]="selectedYear"
+          name="selectedYear"
+        >
+          <option [ngValue]="null">Seleccione un año</option>
+          <option *ngFor="let option of yearOptions" [ngValue]="option.year">
+            {{ option.year }}
+          </option>
+        </select>
+      </div>
+
+      <table *ngIf="selectedYear !== null && visibleRows.length; else yearSelectionState">
         <thead>
           <tr>
             <th colspan="3" class="table-edit__title">
-              Cronograma de fases para el año 2025
+              Cronograma de fases para el año {{ selectedYear }}
             </th>
           </tr>
         </thead>
@@ -40,7 +48,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let row of rows | slice: 0 : 5">
+          <tr *ngFor="let row of visibleRows">
             <td>
               <div class="table-edit__stage">
                 <span class="table-edit__stage-badge"
@@ -83,67 +91,17 @@
           </tr>
         </tbody>
       </table>
-      <br />
-      <table>
-        <thead>
-          <tr>
-            <th colspan="3" class="table-edit__title">
-              Cronograma de fases para el año 2026
-            </th>
-          </tr>
-        </thead>
-        <thead>
-          <tr>
-            <th>Fase</th>
-            <th>Estado de la fase</th>
-            <th></th>
-          </tr>
-        </thead>
 
-        <tbody>
-          <tr *ngFor="let row of rows | slice: 5 : 10">
-            <td>
-              <div class="table-edit__stage">
-                <span class="table-edit__stage-badge"
-                  >Fase {{ row.stage }}</span
-                >
-                <strong>{{ row.labelStage }}</strong>
-              </div>
-            </td>
-
-            <td>
-              <div class="table-edit__toggle">
-                <label class="toggle-switch">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="row.enable"
-                    name="enable-{{ row.stage }}"
-                  />
-                  <span class="toggle-switch__slider"></span>
-                </label>
-                <span
-                  class="table-edit__status"
-                  [ngClass]="row.enable ? 'is-active' : 'is-inactive'"
-                >
-                  {{ row.enable ? "Habilitada" : "Deshabilitada" }}
-                </span>
-              </div>
-            </td>
-
-            <td class="table-edit__actions">
-              <button
-                type="button"
-                (click)="saveRow(row)"
-                [disabled]="savingStage === row.stage"
-              >
-                {{
-                  savingStage === row.stage ? "Guardando..." : "Guardar estado"
-                }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <ng-template #yearSelectionState>
+        <div class="table-edit__selection-message">
+          <p *ngIf="selectedYear === null; else yearWithoutRows">
+            Seleccione un año.
+          </p>
+          <ng-template #yearWithoutRows>
+            <p>No hay fases configuradas para el año {{ selectedYear }}.</p>
+          </ng-template>
+        </div>
+      </ng-template>
     </div>
 
     <footer class="table-edit__hint">

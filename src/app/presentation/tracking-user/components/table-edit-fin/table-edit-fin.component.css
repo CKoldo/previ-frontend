@@ -42,6 +42,34 @@
 	overflow-x: auto;
 }
 
+.table-edit__filters {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.table-edit__filter-label {
+	color: #475569;
+	font-weight: 600;
+}
+
+.table-edit__select {
+	min-width: 140px;
+	padding: 0.65rem 0.9rem;
+	border: 1px solid #cbd5e1;
+	border-radius: 0.85rem;
+	background: #fff;
+	color: #0f172a;
+	font-weight: 600;
+}
+
+.table-edit__select:focus-visible {
+	outline: 3px solid rgba(14, 165, 233, 0.25);
+	outline-offset: 1px;
+}
+
 table {
 	width: 100%;
 	border-collapse: collapse;
@@ -192,6 +220,15 @@ th {
 	border-radius: 1rem;
 }
 
+.table-edit__selection-message {
+	padding: 2rem;
+	text-align: center;
+	color: #64748b;
+	border: 1px dashed #cbd5e1;
+	border-radius: 1rem;
+	background: #f8fafc;
+}
+
 .survey-edit__actions {
 	grid-column: 1 / -1;
 	display: flex;
@@ -216,4 +253,16 @@ th {
 	align-items: center;
 	text-align: center;
 	
+}
+
+@media (max-width: 640px) {
+	.table-edit__filters {
+		justify-content: stretch;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.table-edit__select {
+		width: 100%;
+	}
 }

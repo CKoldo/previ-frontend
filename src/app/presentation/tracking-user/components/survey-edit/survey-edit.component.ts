@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, Type } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -304,13 +305,26 @@ export class SurveyEditComponent implements OnDestroy {
 
   private buildForm(): FormGroup {
     return this.fb.group({
-      codigoLocal: ['', [Validators.required]],
-      numeroDocumento: ['', [Validators.required]],
+      codigoLocal: ['', [Validators.required, this.trimmedRequiredValidator]],
+      numeroDocumento: [
+        '',
+        [Validators.required, this.trimmedRequiredValidator],
+      ],
       stage: [null as number | null, [Validators.required]],
       task: [null as number | null, [Validators.required]],
       year: [null as ScheduleYear | null, [Validators.required]],
     });
   }
+
+  private readonly trimmedRequiredValidator = (control: AbstractControl) => {
+    const value = control.value;
+
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    return value.trim() ? null : { required: true };
+  };
 
   private initStageWatcher(): void {
     const stageControl = this.form.get('stage');

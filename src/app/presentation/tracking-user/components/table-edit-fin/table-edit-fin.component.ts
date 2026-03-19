@@ -25,6 +25,12 @@ interface StageEnableRow {
   enable: boolean;
 }
 
+interface YearOption {
+  year: number;
+  start: number;
+  end: number;
+}
+
 @Component({
   selector: 'app-table-edit-fin',
   standalone: true,
@@ -37,6 +43,11 @@ export class TableEditFinComponent implements OnInit {
   rows: StageEnableRow[] = [];
   savingStage: number | null = null;
   loading = false;
+  selectedYear: number | null = null;
+  readonly yearOptions: YearOption[] = [
+    { year: 2025, start: 0, end: 5 },
+    { year: 2026, start: 5, end: 10 },
+  ];
 
   constructor(
     private readonly _getScheduleDates: GetScheduleDatesHandler,
@@ -49,7 +60,23 @@ export class TableEditFinComponent implements OnInit {
     void this.loadRowsFromServer();
   }
 
-    goBack(): void {
+  get visibleRows(): StageEnableRow[] {
+    if (this.selectedYear === null) {
+      return [];
+    }
+
+    const selectedOption = this.yearOptions.find(
+      (option) => option.year === this.selectedYear
+    );
+
+    if (!selectedOption) {
+      return [];
+    }
+
+    return this.rows.slice(selectedOption.start, selectedOption.end);
+  }
+
+  goBack(): void {
     this.router.navigate(['/tracking-user']);
   }
 
