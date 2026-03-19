@@ -1,6 +1,6 @@
 .table-edit {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	padding: 2rem clamp(1rem, 4vw, 3rem);
 	background: #f8fafc;
 	min-height: calc(100vh - 6rem);
