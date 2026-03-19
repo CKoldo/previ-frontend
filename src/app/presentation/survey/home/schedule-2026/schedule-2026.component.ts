@@ -29,7 +29,7 @@ export class Schedule2026Component {
     // Ejemplo: 2026-04-01T00:00:00.000Z => 2026-04-01
     const iso = dateStr.slice(0, 10);
     const [year, month, day] = iso.split('-');
-    if (year && month && day) return `${year}/${month}/${day}`;
+    if (year && month && day) return `${day}/${month}/${year}`;
     return '';
   }
   @Output() selectedStage = new EventEmitter<any>();

@@ -25,23 +25,22 @@
     <ng-template pTemplate="caption">
       <div class="survey-edit__actions">
         <div>
-        <button type="button" class="btn ghost" (click)="goBack()">
-          Regresar Home
-        </button>
+          <button type="button" class="btn ghost" (click)="goBack()">
+            Regresar
+          </button>
         </div>
         <div>
-        <i class="pi pi-search mx-5 mt-5" style="text-align: right;"> </i>
-        <input
-          type="text"
-          pInputText
-          size="50"
-          placeholder="Buscador global"
-          (input)="dt1.filterGlobal(cleanVal($event), 'contains')"
-          style="width: auto"
-        />
+          <i class="pi pi-search mx-5 mt-5" style="text-align: right"> </i>
+          <input
+            type="text"
+            pInputText
+            size="50"
+            placeholder="Buscador global"
+            (input)="dt1.filterGlobal(cleanVal($event), 'contains')"
+            style="width: auto"
+          />
         </div>
       </div>
-
     </ng-template>
     <!-- CABECERA DE LA TABLA -->
     <ng-template pTemplate="header">

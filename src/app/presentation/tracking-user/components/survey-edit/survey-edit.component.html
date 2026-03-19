@@ -1,12 +1,19 @@
 <div class="survey-edit__container">
   <section class="survey-edit__card">
-    <div>
-      <p class="survey-edit__eyebrow">Edición administrativa</p>
-      <h1 class="survey-edit__title">Editar registro PREVI</h1>
-      <p class="survey-edit__subtitle">
-        Selecciona el código local, documento y la fase/tarea para cargar las
-        respuestas guardadas.
-      </p>
+    <div class="flex justify-between items-center">
+      <div>
+        <button type="button" class="btn ghost" (click)="goBack()">
+          Regresar
+        </button>
+      </div>
+      <div>
+        <p class="survey-edit__eyebrow">Edición administrativa</p>
+        <h1 class="survey-edit__title">Editar registro PREVI</h1>
+        <p class="survey-edit__subtitle">
+          Selecciona el código local, documento y la fase/tarea para cargar las
+          respuestas guardadas.
+        </p>
+      </div>
     </div>
 
     <form
@@ -14,6 +21,15 @@
       (ngSubmit)="loadSurvey()"
       class="survey-edit__form"
     >
+      <label class="survey-edit__field">
+        <span>Año</span>
+        <select formControlName="year">
+          <option [ngValue]="null" disabled>Selecciona un año</option>
+          <option *ngFor="let option of yearOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
       <label class="survey-edit__field">
         <span>Código local</span>
         <!--
@@ -60,19 +76,8 @@
           </option>
         </select>
       </label>
-      <label class="survey-edit__field">
-        <span>Year</span>
-        <select formControlName="year">
-          <option [ngValue]="null" disabled>Selecciona un año</option>
-          <option *ngFor="let option of yearOptions" [ngValue]="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </label>
+
       <div class="survey-edit__actions">
-        <button type="button" class="btn ghost" (click)="goBack()">
-          Regresar Home
-        </button>
         <button type="button" class="btn ghost" (click)="clearSelection()">
           Limpiar
         </button>
@@ -81,11 +86,12 @@
         </button>
       </div>
     </form>
-
+    <!--
     <p class="survey-edit__hint">
       Los cambios se guardarán sobre la misma fila de la tabla
       <strong>registro_previ</strong>.
     </p>
+  -->
     <p class="survey-edit__error" *ngIf="errorMessage">{{ errorMessage }}</p>
   </section>
 
