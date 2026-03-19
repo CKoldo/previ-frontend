@@ -102,7 +102,7 @@ export class SurveyRepository implements ISurveyRepository {
     };
 
     const numeroDocumento = this.resolveNumeroDocumentoFromStorage();
-    if (numeroDocumento) {
+    if (!payload.NUMERO_DOCUMENTO && numeroDocumento) {
       payload.NUMERO_DOCUMENTO = numeroDocumento;
     }
 

@@ -19,8 +19,12 @@ import { Stage2Component as Stage2Component2026 } from 'app/presentation/survey/
 import { Stage3Component as Stage3Component2026 } from 'app/presentation/survey/home/stage-2026/stage-3/stage-3.component';
 import { Stage4Component as Stage4Component2026 } from 'app/presentation/survey/home/stage-2026/stage-4/stage-4.component';
 import { Stage5Component as Stage5Component2026 } from 'app/presentation/survey/home/stage-2026/stage-5/stage-5.component';
+import { ISurveyRepository } from 'app/domain/survey/survey.repository';
+import { SurveyDataInfo } from 'app/domain/survey/survey.model';
 import { ConfigSurvey } from 'app/shared/constants/configs';
+import { OnlyNumberDirective } from 'app/shared/directives/only-number.directive';
 import { TemporalSaveService } from 'app/shared/services/temporal-save.service';
+import { resolveApiStage } from 'app/shared/utils/stage-year-mapper.util';
 import {
   disableSurveyEditMode,
   enableSurveyEditMode,
@@ -62,6 +66,7 @@ interface YearOption {
     Stage3Component2026,
     Stage4Component2026,
     Stage5Component2026,
+    OnlyNumberDirective,
   ],
   templateUrl: './survey-edit.component.html',
   styleUrls: ['./survey-edit.component.css'],
@@ -128,6 +133,7 @@ export class SurveyEditComponent implements OnDestroy {
   constructor(
     private router: Router,
     private fb: FormBuilder,
+    private surveyRepository: ISurveyRepository,
     private temporalSaveService: TemporalSaveService,
     private cdr: ChangeDetectorRef,
   ) {
@@ -195,7 +201,22 @@ export class SurveyEditComponent implements OnDestroy {
     const backendStage = this.resolveBackendStage(stage, scheduleYear);
 
     this.isRecordLoading = true;
+    this.showSurvey = false;
+    this.childLoading = false;
     try {
+      const recordExists = await this.validateExistingRecord({
+        CODIGO_LOCAL: codigoLocal,
+        NUMERO_DOCUMENTO: numeroDocumento,
+        FASE: resolveApiStage(stage, scheduleYear),
+        TAREA: task,
+      });
+
+      if (!recordExists) {
+        this.errorMessage =
+          'No se encontró un registro guardado con el código local, documento, fase y tarea seleccionados.';
+        return;
+      }
+
       this.persistContext(numeroDocumento, codigoLocal, scheduleYear);
       this.setStageConfig(scheduleYear);
       this.setCurrentSurvey(stage, task);
@@ -303,12 +324,32 @@ export class SurveyEditComponent implements OnDestroy {
     this.temporalSaveService.saveCurrentQuestionTemp(found.questions);
   }
 
+  private async validateExistingRecord(params: SurveyDataInfo): Promise<boolean> {
+    const response = await this.surveyRepository.getSurveyData(params);
+    const result = response?.result;
+
+    return Array.isArray(result) && result.length > 0;
+  }
+
   private buildForm(): FormGroup {
     return this.fb.group({
-      codigoLocal: ['', [Validators.required, this.trimmedRequiredValidator]],
+      codigoLocal: [
+        '',
+        [
+          Validators.required,
+          this.trimmedRequiredValidator,
+          Validators.pattern(/^\d+$/),
+          Validators.maxLength(6),
+        ],
+      ],
       numeroDocumento: [
         '',
-        [Validators.required, this.trimmedRequiredValidator],
+        [
+          Validators.required,
+          this.trimmedRequiredValidator,
+          Validators.pattern(/^\d+$/),
+          Validators.maxLength(8),
+        ],
       ],
       stage: [null as number | null, [Validators.required]],
       task: [null as number | null, [Validators.required]],
