@@ -109,6 +109,7 @@ export class TableEditFinComponent implements OnInit {
     }
 
     const { row, start, end } = payload;
+    const yearOption = this.getYearOptionForStage(row.stage);
 
     if (!start || !end) {
       return 'Debe seleccionar la fecha de inicio y la fecha de fin.';
@@ -118,9 +119,28 @@ export class TableEditFinComponent implements OnInit {
       return 'La fecha de inicio no puede ser mayor que la fecha de fin.';
     }
 
+    const previousRow = this.getPreviousRowInSameYear(row.stage);
+    if (previousRow && start <= previousRow.end) {
+      return `La fecha de inicio debe ser mayor que el fin de la fase anterior (${previousRow.labelStage}: ${previousRow.end}).`;
+    }
+
+    if (yearOption && this.isFirstStageOfYear(row.stage)) {
+      const minStartDate = `${yearOption.year}-01-01`;
+      if (start < minStartDate) {
+        return `La fecha de inicio de ${row.labelStage} no puede ser menor que ${minStartDate}.`;
+      }
+    }
+
     const nextRow = this.getNextRowInSameYear(row.stage);
     if (nextRow && end >= nextRow.start) {
       return `La fecha de fin debe ser menor que el inicio de la siguiente fase (${nextRow.labelStage}: ${nextRow.start}).`;
+    }
+
+    if (yearOption && this.isLastStageOfYear(row.stage)) {
+      const lastDayOfYear = `${yearOption.year}-12-31`;
+      if (end > lastDayOfYear) {
+        return `La fecha de fin de ${row.labelStage} no puede ser mayor que ${lastDayOfYear}.`;
+      }
     }
 
     return null;
@@ -398,15 +418,63 @@ export class TableEditFinComponent implements OnInit {
       return null;
     }
 
-    const currentYearOption = this.yearOptions.find(
-      (option) => currentIndex >= option.start && currentIndex < option.end
-    );
+    const currentYearOption = this.getYearOptionForStage(stage);
 
     if (!currentYearOption || currentIndex + 1 >= currentYearOption.end) {
       return null;
     }
 
     return this.rows[currentIndex + 1] ?? null;
+  }
+
+  private getPreviousRowInSameYear(stage: number): StageEnableRow | null {
+    const currentIndex = this.rows.findIndex((row) => row.stage === stage);
+
+    if (currentIndex === -1) {
+      return null;
+    }
+
+    const currentYearOption = this.getYearOptionForStage(stage);
+
+    if (!currentYearOption || currentIndex - 1 < currentYearOption.start) {
+      return null;
+    }
+
+    return this.rows[currentIndex - 1] ?? null;
+  }
+
+  private getYearOptionForStage(stage: number): YearOption | null {
+    const currentIndex = this.rows.findIndex((row) => row.stage === stage);
+
+    if (currentIndex === -1) {
+      return null;
+    }
+
+    return (
+      this.yearOptions.find(
+        (option) => currentIndex >= option.start && currentIndex < option.end
+      ) ?? null
+    );
+  }
+
+  private isFirstStageOfYear(stage: number): boolean {
+    const yearOption = this.getYearOptionForStage(stage);
+
+    if (!yearOption) {
+      return false;
+    }
+
+    return this.rows[yearOption.start]?.stage === stage;
+  }
+
+  private isLastStageOfYear(stage: number): boolean {
+    const yearOption = this.getYearOptionForStage(stage);
+
+    if (!yearOption) {
+      return false;
+    }
+
+    return this.rows[yearOption.end - 1]?.stage === stage;
   }
 
   private mapApiResponseToEntries(
