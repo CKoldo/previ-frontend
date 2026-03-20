@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import {
   ReportEntryData,
   ScheduleDateUpdate,
-  StageStatusUpdate,
   SurveyConfiguration,
   SurveyData,
   SurveyDataInfo,
@@ -57,15 +56,6 @@ export class SurveyRepository implements ISurveyRepository {
     return lastValueFrom(
       this._HttpClient.post(
         `${this._apiUrlBase}api/sistema/fase/actualizar`,
-        params
-      )
-    );
-  }
-
-  updateStageStatus(params: StageStatusUpdate) {
-    return lastValueFrom(
-      this._HttpClient.post(
-        `${this._apiUrlBase}api/sistema/fase/actualizar/esactivo`,
         params
       )
     );

@@ -40,13 +40,6 @@ export interface ScheduleDateUpdate {
   ID_FASE: number;
   FECHA_INICIO: string | null;
   FECHA_FIN: string | null;
-  ES_ACTIVO?: number | boolean;
-}
-
-export interface StageStatusUpdate {
-  ID_FASE: number;
-  ES_ACTIVO: number | boolean;
-  YEAR?: string;
 }
 
 

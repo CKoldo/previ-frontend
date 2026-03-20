@@ -10,8 +10,8 @@
         <p class="table-edit__eyebrow">Herramientas administrativas</p>
         <h1>Controlar cronograma de fases</h1>
         <p>
-          Activa o desactiva manualmente cada fase para permitir o bloquear el
-          acceso al cuestionario correspondiente.
+          Configure el rango de fechas de cada fase para que el acceso al
+          cuestionario se habilite automaticamente segun el calendario.
         </p>
       </div>
     </header>
@@ -47,9 +47,9 @@
         <thead>
           <tr>
             <th>Fase</th>
-            <th>Estado de la fase</th>
+            <th>Estado calculado</th>
             <th>Rango de fechas</th>
-            <th class="col-span-2"></th>
+            <th></th>
           </tr>
         </thead>
 
@@ -67,48 +67,36 @@
             </td>
             <!--Estado-->
             <td>
-              <div class="table-edit__toggle">
-                <label class="toggle-switch">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="row.enable"
-                    name="enable-{{ row.stage }}"
-                  />
-                  <span class="toggle-switch__slider"></span>
-                </label>
+              <div class="table-edit__status-stack">
                 <span
                   class="table-edit__status"
-                  [ngClass]="row.enable ? 'is-active' : 'is-inactive'"
+                  [ngClass]="getStageStatusMeta(row).className"
                 >
-                  {{ row.enable ? "Habilitada" : "Deshabilitada" }}
+                  {{ getStageStatusMeta(row).label }}
                 </span>
+                <small class="table-edit__status-detail">
+                  {{ getStageStatusMeta(row).detail }}
+                </small>
               </div>
             </td>
             <!--Rango de fechas-->
             <td>
               <div class="table-edit__stage">
-                <h2>{{ row.start }} - {{ row.end }}</h2>
+                <h2>{{ formatDisplayDate(row.start) }} - {{ formatDisplayDate(row.end) }}</h2>
               </div>
             </td>
 
             <!--Acciones-->
             <td class="table-edit__actions">
-              <button
-                type="button"
-                [disabled]="savingStage === row.stage || savingDateStage === row.stage"
-                (click)="editRow(row)"
-                class="pi pi-calendar mr-2">
-                  {{ savingDateStage === row.stage ? "Guardando fechas..." : "Editar fechas" }}
-              </button>
-              <button
-                type="button"
-                (click)="saveRow(row)"
-                [disabled]="savingStage === row.stage || savingDateStage === row.stage"
-              >
-                {{
-                  savingStage === row.stage ? "Guardando..." : "Guardar estado"
-                }}
-              </button>
+              <div class="table-edit__actions-inner">
+                <button
+                  type="button"
+                  [disabled]="savingDateStage === row.stage"
+                  (click)="editRow(row)"
+                  class="pi pi-calendar mr-2">
+                    {{ savingDateStage === row.stage ? "Guardando fechas..." : "Editar fechas" }}
+                </button>
+              </div>
             </td>
 
           </tr>
@@ -129,8 +117,8 @@
 
     <footer class="table-edit__hint">
       <p>
-        Los cambios afectan inmediatamente al cronograma que se usa en el módulo
-        de encuestas.
+        El estado de cada fase se calcula automaticamente segun la fecha actual
+        y el rango configurado.
       </p>
     </footer>
   </section>

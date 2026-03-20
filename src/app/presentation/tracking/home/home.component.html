@@ -1,8 +1,11 @@
 <div class="flex flex-col items-center justify-start w-screen py-10">
-  <div class="bg-[#eceef9] rounded-lg p-6 col-span-3 overflow-x-auto w-[90%] mx-8">
+  <div
+    class="bg-[#eceef9] rounded-lg p-6 col-span-3 overflow-x-auto w-[90%] mx-8"
+  >
     <div class="my-2 mt-0 overflow-x-auto h-full">
-      <div class="py-2 flex flex-col align-middle max-w-screen sm:px-6 lg:px-8 max-h-[1000px] justify-between">
-
+      <div
+        class="py-2 flex flex-col align-middle max-w-screen sm:px-6 lg:px-8 max-h-[1000px] justify-between"
+      >
         <div class="w-full max-w-md flex flex-col gap-2">
           <label class="text-sm font-medium text-slate-700">
             Selecciona el año del seguimiento
@@ -23,13 +26,24 @@
                 <div class="flex items-center gap-2">
                   <i class="pi text-sky-600" [ngClass]="option.icon"></i>
                   <div class="flex flex-col">
-                    <span class="font-medium text-slate-900">{{ option.title }}</span>
-                    <span class="text-xs text-slate-500">{{ option.description }}</span>
+                    <span class="font-medium text-slate-900">{{
+                      option.title
+                    }}</span>
+                    <span class="text-xs text-slate-500">{{
+                      option.description
+                    }}</span>
                   </div>
                 </div>
                 <div class="flex flex-col items-end">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ option.year }}</span>
-                  <span *ngIf="option.disabled" class="text-[11px] font-semibold text-amber-600">Sin registros</span>
+                  <span
+                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    >{{ option.year }}</span
+                  >
+                  <span
+                    *ngIf="option.disabled"
+                    class="text-[11px] font-semibold text-amber-600"
+                    >Sin registros</span
+                  >
                 </div>
               </div>
             </ng-template>
@@ -41,29 +55,68 @@
             </ng-template>
           </p-select>
         </div>
+        <!--Botones-->
+        <div class="flex justify-between w-full items-center mt-6 pr-6">
+          <!--Izquierdo-->
+          <div class="flex items-center gap-2">
+            <i class="pi pi-search"> </i>
+            <input
+              class="border border-black-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              type="text"
+              pInputText
+              [(ngModel)]="globalSearchTerm"
+              size="50"
+              placeholder="Buscador global"
 
-        <div class="flex gap-4 w-full justify-end items-center mt-6 pr-6">
-          <div class="flex flex-col text-right mr-auto pl-2">
-            <span class="text-xs uppercase tracking-wide text-slate-500">Año seleccionado</span>
-            <span class="text-lg font-semibold text-slate-800">{{ selectedScheduleYear }}</span>
+            />
           </div>
-          <button pButton (click)="refresh()"
-            class="bg-blue-500 text-white p-2 w-40 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
-            [disabled]="isRefreshing" [loading]="isRefreshing" loadingIcon="pi pi-spin pi-spinner">
-            {{isRefreshing?"Actualizando":"Actualizar"}}
-          </button>
-          <button pButton (click)="generateReport()"
-            class="bg-green-500 text-white p-2 w-60 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
-            [disabled]="isLoadingDownload" [loading]="isLoadingDownload" loadingIcon="pi pi-spin pi-spinner">
-            {{isLoadingDownload?"Generando reporte":"Generar reporte"}}
-          </button>
+          <!--Derecho-->
+          <div class="flex gap-4">
+            <button
+              pButton
+              (click)="refresh()"
+              class="bg-blue-500 text-white p-2 w-40 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
+              [disabled]="isRefreshing"
+              [loading]="isRefreshing"
+              loadingIcon="pi pi-spin pi-spinner"
+            >
+              {{ isRefreshing ? "Actualizando" : "Actualizar" }}
+            </button>
+            <button
+              pButton
+              (click)="generateReport()"
+              class="bg-green-500 text-white p-2 w-60 cursor-pointer text-md transition ease-in duration-500 rounded-xl"
+              [disabled]="isLoadingDownload || !hasSelectedScheduleYear"
+              [loading]="isLoadingDownload"
+              loadingIcon="pi pi-spin pi-spinner"
+            >
+              {{ isLoadingDownload ? "Generando reporte" : "Generar reporte" }}
+            </button>
+          </div>
         </div>
 
-        <div *ngIf="!hasDataForSelectedYear" class="mt-4 border border-dashed border-amber-400 bg-amber-50 text-amber-800 px-4 py-3 rounded-lg">
-          No se encontraron registros para {{ selectedScheduleYear }}. Selecciona otro año para revisar el histórico disponible.
+        <div
+          *ngIf="!hasSelectedScheduleYear"
+          class="mt-4 border border-dashed border-slate-300 bg-slate-50 text-slate-700 px-4 py-3 rounded-lg"
+        >
+          Seleccione un año para mostrar.
         </div>
 
-        <app-table-checker class="mt-4" [scheduleYear]="selectedScheduleYear" [refreshToken]="refreshVersion" />
+        <div
+          *ngIf="hasSelectedScheduleYear && !hasDataForSelectedYear"
+          class="mt-4 border border-dashed border-amber-400 bg-amber-50 text-amber-800 px-4 py-3 rounded-lg"
+        >
+          No se encontraron registros para {{ selectedScheduleYear }}.
+          Selecciona otro año para revisar el histórico disponible.
+        </div>
+
+        <app-table-checker
+          *ngIf="hasSelectedScheduleYear"
+          class="mt-4"
+          [scheduleYear]="selectedScheduleYear!"
+          [searchTerm]="globalSearchTerm"
+          [refreshToken]="refreshVersion"
+        />
       </div>
     </div>
   </div>

@@ -29,7 +29,6 @@ import { IAuthRepository } from 'app/domain/auth/auth.repository';
 import { AuthRepository } from 'app/infrastructure/repositories/auth.repository';
 import {
   ScheduleYear,
-  getActiveStageYear,
   setActiveStageYear,
 } from 'app/shared/utils/stage-storage.util';
 
@@ -58,7 +57,8 @@ export class HomeComponent implements OnInit {
   isLoadingDownload: boolean = false;
   isRefreshing: boolean = false;
   refreshVersion: number = 0;
-  selectedScheduleYear: ScheduleYear = getActiveStageYear();
+  globalSearchTerm: string = '';
+  selectedScheduleYear: ScheduleYear | null = null;
   yearAvailability: Record<ScheduleYear, boolean> = {
     '2025': false,
     '2026': false,
@@ -106,10 +106,17 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshYearAvailability();
-    this.ensureSelectedYearHasData();
+  }
+
+  get hasSelectedScheduleYear(): boolean {
+    return this.selectedScheduleYear !== null;
   }
 
   get hasDataForSelectedYear(): boolean {
+    if (!this.selectedScheduleYear) {
+      return false;
+    }
+
     return !!this.yearAvailability[this.selectedScheduleYear];
   }
 
@@ -126,17 +133,23 @@ export class HomeComponent implements OnInit {
     }));
   }
 
-  selectScheduleYear(year: ScheduleYear) {
+  selectScheduleYear(year: ScheduleYear | null) {
     if (this.selectedScheduleYear === year) {
       return;
     }
 
     this.selectedScheduleYear = year;
-    setActiveStageYear(year);
+    if (year) {
+      setActiveStageYear(year);
+    }
     this.refreshYearAvailability();
   }
 
   async prepareDataForReport() {
+    if (!this.selectedScheduleYear) {
+      return null;
+    }
+
     const conf = await prepareDataForReport(
       this._GenerateReportCommand,
       window.localStorage,
@@ -148,6 +161,14 @@ export class HomeComponent implements OnInit {
 
   async generateReport() {
     if (this.isLoadingDownload) {
+      return;
+    }
+
+    if (!this.selectedScheduleYear) {
+      Swal.fire({
+        text: 'Seleccione un año para mostrar.',
+        icon: 'info',
+      });
       return;
     }
 
@@ -202,7 +223,6 @@ export class HomeComponent implements OnInit {
       localStorage.setItem('dataTracking', JSON.stringify(normalizedTracking));
 
       this.refreshYearAvailability();
-      this.ensureSelectedYearHasData();
       this.refreshVersion += 1;
 
       Swal.fire({
@@ -276,21 +296,6 @@ export class HomeComponent implements OnInit {
     } catch (error) {
       console.warn('No se pudo leer los datos de tracking por año', error);
       return emptyPayload;
-    }
-  }
-
-  private ensureSelectedYearHasData() {
-    if (this.yearAvailability[this.selectedScheduleYear]) {
-      return;
-    }
-
-    const fallback = (['2025', '2026'] as ScheduleYear[]).find(
-      (year) => this.yearAvailability[year],
-    );
-
-    if (fallback) {
-      this.selectedScheduleYear = fallback;
-      setActiveStageYear(fallback);
     }
   }
 

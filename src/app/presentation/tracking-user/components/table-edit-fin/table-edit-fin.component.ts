@@ -6,7 +6,6 @@ import Swal from 'sweetalert2';
 
 import { GetScheduleDatesHandler } from 'app/application/survey/get-schedule-dates/get-schedule-dates.handler';
 import { UpdateScheduleDatesHandler } from 'app/application/survey/update-schedule-dates/update-schedule-dates.handler';
-import { UpdateStageStatusHandler } from 'app/application/survey/update-stage-status/update-stage-status.handler';
 import { ISurveyRepository } from 'app/domain/survey/survey.repository';
 import { SurveyRepository } from 'app/infrastructure/repositories/survey.repository';
 import { ConfigSurvey } from 'app/shared/constants/configs';
@@ -32,6 +31,12 @@ interface StageDateForm {
   end: string;
 }
 
+interface StageStatusMeta {
+  label: string;
+  detail: string;
+  className: string;
+}
+
 interface YearOption {
   year: number;
   start: number;
@@ -48,7 +53,6 @@ interface YearOption {
 })
 export class TableEditFinComponent implements OnInit {
   rows: StageEnableRow[] = [];
-  savingStage: number | null = null;
   savingDateStage: number | null = null;
   loading = false;
   selectedYear: number | null = null;
@@ -66,7 +70,6 @@ export class TableEditFinComponent implements OnInit {
   constructor(
     private readonly _getScheduleDates: GetScheduleDatesHandler,
     private readonly _updateScheduleDates: UpdateScheduleDatesHandler,
-    private readonly _updateStageStatus: UpdateStageStatusHandler,
     private readonly router: Router
   ) {}
 
@@ -230,7 +233,6 @@ export class TableEditFinComponent implements OnInit {
         ID_FASE: row.stage,
         FECHA_INICIO: start,
         FECHA_FIN: end,
-        ES_ACTIVO: row.enable ? 1 : 0,
       });
 
       const updatedEntries: StageEnableEntry[] = this.rows.map((item) => ({
@@ -263,58 +265,6 @@ export class TableEditFinComponent implements OnInit {
       await this.loadRowsFromServer(false);
     } finally {
       this.savingDateStage = null;
-    }
-  }
-
-  async saveRow(row: StageEnableRow): Promise<void> {
-    this.savingStage = row.stage;
-
-    Swal.fire({
-      title: 'Guardando estado...',
-      text: 'Espere un momento.',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    try {
-      const updateResult = await this._updateStageStatus.execute({
-        ID_FASE: row.stage,
-        ES_ACTIVO: row.enable ? 1 : 0,
-      });
-      //console.log('[TableEditFin] updateStageStatus result', updateResult);
-
-      const updatedEntries: StageEnableEntry[] = this.rows.map((item) => ({
-        stage: item.stage,
-        enable: item.enable,
-        start: item.start,
-        end: item.end,
-      }));
-      this.persistEntries(updatedEntries);
-
-      await this.loadRowsFromServer(false);
-      Swal.close();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Estado actualizado',
-        text: `La ${row.labelStage} se marcó como ${row.enable ? 'habilitada' : 'deshabilitada'}.`,
-        timer: 2200,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.error('No se pudo actualizar la fase', error);
-      Swal.close();
-      Swal.fire({
-        icon: 'error',
-        title: 'No se pudo guardar',
-        text: 'Intenta nuevamente en unos minutos.',
-      });
-      await this.loadRowsFromServer(false);
-    } finally {
-      this.savingStage = null;
     }
   }
 
@@ -546,11 +496,74 @@ export class TableEditFinComponent implements OnInit {
     localStorage.setItem('stage', JSON.stringify(updated));
   }
 
+  getStageStatusMeta(row: StageEnableRow): StageStatusMeta {
+    const today = this.getTodayAsDateOnly();
+
+    if (!row.start || !row.end) {
+      return {
+        label: 'Sin rango',
+        detail: 'Configure la fecha de inicio y fin.',
+        className: 'is-pending',
+      };
+    }
+
+    if (row.enable) {
+      return {
+        label: 'Activa',
+        detail: 'Disponible en la fecha actual.',
+        className: 'is-active',
+      };
+    }
+
+    if (today < row.start) {
+      return {
+        label: 'Programada',
+        detail: `Inicia el ${row.start}.`,
+        className: 'is-scheduled',
+      };
+    }
+
+    if (today > row.end) {
+      return {
+        label: 'Finalizada',
+        detail: `Finalizó el ${row.end}.`,
+        className: 'is-inactive',
+      };
+    }
+
+    return {
+      label: 'No disponible',
+      detail: 'Revise la configuración del rango en el backend.',
+      className: 'is-pending',
+    };
+  }
+
+  formatDisplayDate(value?: string): string {
+    if (!value) {
+      return '--/--/----';
+    }
+
+    const normalized = this.normalizeDate(value);
+    if (!normalized) {
+      return '--/--/----';
+    }
+
+    const [year, month, day] = normalized.split('-');
+    return `${day}-${month}-${year}`;
+  }
+
   private extractStageNumber(label?: string): number | null {
     if (!label) {
       return null;
     }
     const match = label.match(/(\d+)/);
     return match ? Number(match[1]) : null;
+  }
+
+  private getTodayAsDateOnly(): string {
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${today.getFullYear()}-${month}-${day}`;
   }
 }

@@ -44,6 +44,7 @@ import { ScheduleYear } from 'app/shared/utils/stage-storage.util';
 export class TableCheckerComponent implements OnInit, OnChanges {
   @Input() scheduleYear: ScheduleYear = '2025';
   @Input() refreshToken: number = 0;
+  @Input() searchTerm: string = '';
   arrayTabla: any[] = [];
   phaseHeaders: any[] = [];
   listaIEs: any = [];
@@ -85,10 +86,19 @@ export class TableCheckerComponent implements OnInit, OnChanges {
 
     if (changes['refreshToken'] && !changes['refreshToken'].firstChange) {
       this.syncTableData();
+      return;
+    }
+
+    if (changes['searchTerm'] && !changes['searchTerm'].firstChange) {
+      this.syncTableData();
     }
   }
 
   get emptyTableMessage(): string {
+    if (this.searchTerm?.trim()) {
+      return 'No se encontraron instituciones con ese criterio de búsqueda.';
+    }
+
     return `Sin registros para el año ${this.scheduleYear}.`;
   }
 
@@ -146,12 +156,15 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     const data = localStorage.getItem('dataTracking');
     const payload = this.parseTrackingPayload(data);
     const yearEntries = payload[this.scheduleYear] ?? [];
+    const normalizedSearch = this.normalizeSearchTerm(this.searchTerm);
 
-    this.listaIEs = yearEntries.map((ie: any) => ({
-      ...ie,
-      trackingYear: this.resolveEntryYear(ie),
-      checks: this.extractCheckedPhases(ie),
-    }));
+    this.listaIEs = yearEntries
+      .map((ie: any) => ({
+        ...ie,
+        trackingYear: this.resolveEntryYear(ie),
+        checks: this.extractCheckedPhases(ie),
+      }))
+      .filter((ie: any) => this.matchesInstitutionFilter(ie, normalizedSearch));
   }
 
   extractCheckedPhases(data: any): any[] {
@@ -226,6 +239,22 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     return ie.checks.some(
       (item: any) => item.idPhase === phase.idPhase && item.value == 1,
     );
+  }
+
+  editTaskFromCell(ie: any, phase: any): void {
+    const stage = Number(phase?.idStage);
+    const task = this.resolvePhaseTaskNumber(phase);
+
+    if (!Number.isFinite(stage) || !Number.isFinite(task)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No se pudo editar',
+        text: 'La tarea seleccionada no tiene una configuración válida.',
+      });
+      return;
+    }
+
+    this.openTaskEditor(ie, stage, task);
   }
 
   async showPhaseDialog(ie: any) {
@@ -368,10 +397,6 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     return this.collectSelectedPhases().length > 0;
   }
 
-  canEditSelectedPhase(): boolean {
-    return this.collectSelectedPhases().length === 1;
-  }
-
   private collectSelectedPhases(): { stage: number; phase: number }[] {
     const result: { stage: number; phase: number }[] = [];
     Object.keys(this.selectedPhasesByStage || {}).forEach((stageKey) => {
@@ -384,40 +409,19 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     return result;
   }
 
-  navigateToEditTask() {
-    if (!this.selectIE) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Selecciona una institución',
-        text: 'Debes elegir una institución antes de editar una tarea.',
-      });
-      return;
-    }
-
-    const selections = this.collectSelectedPhases();
-    if (selections.length !== 1) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Selecciona una tarea',
-        text: 'Elige exactamente una fase y tarea para editar.',
-      });
-      return;
-    }
-
-    const selected = selections[0];
-    const taskRecord = this.arrayArchivos.find(
-      (a: any) =>
-        Number(a.FASE) === Number(selected.stage) &&
-        Number(a.TAREA) === Number(selected.phase),
-    );
-
-    const normalizedStage = this.normalizeStageForEdit(selected.stage);
+  private openTaskEditor(
+    ie: any,
+    stage: number,
+    phase: number,
+    taskInfo: any = null,
+  ): void {
+    const normalizedStage = this.normalizeStageForEdit(stage);
 
     const context: any = {
-      ie: this.selectIE,
+      ie,
       stage: normalizedStage.stage,
-      phase: selected.phase,
-      taskInfo: taskRecord || null,
+      phase,
+      taskInfo,
       year: this.scheduleYear,
     };
 
@@ -429,6 +433,21 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     //console.log('Contexto guardado para edición:', context);
     this.phaseDialog = false;
     this._router.navigate(['/tracking', 'survey-edit']);
+  }
+
+  private resolvePhaseTaskNumber(phase: any): number {
+    const phaseId = String(phase?.idPhase ?? '');
+    const segments = phaseId.split('-');
+    const suffix = segments.length > 1 ? segments[segments.length - 1] : '';
+    const parsed = Number(suffix);
+
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+
+    const label = String(phase?.label ?? '');
+    const match = label.match(/(\d+)/);
+    return match ? Number(match[1]) : NaN;
   }
 
   private normalizeStageForEdit(stage: number): { stage: number; originalStage?: number } {
@@ -540,5 +559,25 @@ export class TableCheckerComponent implements OnInit, OnChanges {
       return '2026';
     }
     return this.scheduleYear ?? '2025';
+  }
+
+  private matchesInstitutionFilter(ie: any, normalizedSearch: string): boolean {
+    if (!normalizedSearch) {
+      return true;
+    }
+
+    const institutionText = this.normalizeSearchTerm(
+      `${ie?.CODIGO_LOCAL ?? ''} ${ie?.NOMBRE_IE ?? ''}`,
+    );
+
+    return institutionText.includes(normalizedSearch);
+  }
+
+  private normalizeSearchTerm(value: string | null | undefined): string {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
   }
 }

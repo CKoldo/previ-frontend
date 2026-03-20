@@ -109,11 +109,23 @@
           *ngFor="let phase of phaseHeaders"
           class="border border-gray-300 px-4 py-2 text-center"
         >
-          <p-checkbox
-            [ngModel]="getChecks(ie, phase)"
-            [binary]="true"
-            class="pointer-events-none"
-          ></p-checkbox>
+          <div class="tracking-task-cell">
+            <p-checkbox
+              [ngModel]="getChecks(ie, phase)"
+              [binary]="true"
+              class="pointer-events-none"
+            ></p-checkbox>
+            <button
+              *ngIf="getChecks(ie, phase)"
+              type="button"
+              class="tracking-task-cell__edit"
+              title="Editar tarea"
+              aria-label="Editar tarea"
+              (click)="editTaskFromCell(ie, phase)"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+          </div>
         </td>
         <td
           class="border border-gray-300 px-4 py-2 font-medium"
@@ -188,13 +200,6 @@
       icon="pi pi-times"
       text
       (click)="phaseDialog = false"
-    />
-    <p-button
-      label="Editar tarea seleccionada"
-      icon="pi pi-pencil"
-      severity="secondary"
-      (click)="navigateToEditTask()"
-      [disabled]="!canEditSelectedPhase()"
     />
     <p-button
       label="Descargar archivos seleccionados"
