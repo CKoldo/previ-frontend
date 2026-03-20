@@ -82,7 +82,10 @@
             <!--Rango de fechas-->
             <td>
               <div class="table-edit__stage">
-                <h2>{{ formatDisplayDate(row.start) }} - {{ formatDisplayDate(row.end) }}</h2>
+                <h2>
+                  {{ formatDisplayDate(row.start) }} -
+                  {{ formatDisplayDate(row.end) }}
+                </h2>
               </div>
             </td>
 
@@ -93,12 +96,16 @@
                   type="button"
                   [disabled]="savingDateStage === row.stage"
                   (click)="editRow(row)"
-                  class="pi pi-calendar mr-2">
-                    {{ savingDateStage === row.stage ? "Guardando fechas..." : "Editar fechas" }}
+                  class="pi pi-calendar mr-2"
+                >
+                  {{
+                    savingDateStage === row.stage
+                      ? "Guardando fechas..."
+                      : "Editar fechas"
+                  }}
                 </button>
               </div>
             </td>
-
           </tr>
         </tbody>
       </table>
@@ -146,34 +153,33 @@
 >
   <div class="table-edit__dialog" *ngIf="selectedDateRow as row">
     <p class="table-edit__dialog-text">
-      Actualice las fechas para <strong>{{ row.labelStage }}</strong>.
+      Actualice las fechas para <strong>{{ row.labelStage }}</strong
+      >.
     </p>
 
     <div class="table-edit__dialog-grid">
       <label class="table-edit__dialog-field">
         <span>Fecha de inicio</span>
-        <input
-          type="date"
-          [(ngModel)]="dateForm.start"
-          name="date-start"
-        />
+        <input type="date" [(ngModel)]="dateForm.start" name="date-start" />
       </label>
 
       <label class="table-edit__dialog-field">
         <span>Fecha de fin</span>
-        <input
-          type="date"
-          [(ngModel)]="dateForm.end"
-          name="date-end"
-        />
+        <input type="date" [(ngModel)]="dateForm.end" name="date-end" />
       </label>
     </div>
 
-    <p class="table-edit__dialog-feedback" *ngIf="dateValidationMessage as message">
+    <p
+      class="table-edit__dialog-feedback"
+      *ngIf="dateValidationMessage as message"
+    >
       {{ message }}
     </p>
 
-    <p class="table-edit__dialog-feedback" *ngIf="!dateValidationMessage && !hasDateChanges">
+    <p
+      class="table-edit__dialog-feedback"
+      *ngIf="!dateValidationMessage && !hasDateChanges"
+    >
       Modifique al menos una fecha para habilitar el guardado.
     </p>
 

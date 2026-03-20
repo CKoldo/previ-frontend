@@ -518,7 +518,7 @@ export class TableEditFinComponent implements OnInit {
     if (today < row.start) {
       return {
         label: 'Programada',
-        detail: `Inicia el ${row.start}.`,
+        detail: `Inicia el ${this.formatDisplayDate(row.start)}.`,
         className: 'is-scheduled',
       };
     }
@@ -526,7 +526,7 @@ export class TableEditFinComponent implements OnInit {
     if (today > row.end) {
       return {
         label: 'Finalizada',
-        detail: `Finalizó el ${row.end}.`,
+        detail: `Finalizó el ${this.formatDisplayDate(row.end)}.`,
         className: 'is-inactive',
       };
     }
