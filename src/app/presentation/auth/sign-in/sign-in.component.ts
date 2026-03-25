@@ -309,12 +309,14 @@ export class SignInComponent {
               const entryYear = normalizeYearFromApi(result?.YEAR);
               return entryYear ? entryYear === year : true;
             });
-            const enableFromApi = normalizeEnableFromApi(apiEntry?.ES_ACTIVO);
+            const enableFromApi = normalizeEnableFromApi(apiEntry?.ES_ACTIVO_REPORTE);
+            const phaseEnabledFromApi = normalizeEnableFromApi(apiEntry?.ES_ACTIVO_FASE);
             return {
               ...item,
-              start: apiEntry?.FECHA_INICIO ?? item.start,
-              end: apiEntry?.FECHA_FIN ?? item.end,
+              start: apiEntry?.FECHA_INICIO_REPORTE ?? item.start,
+              end: apiEntry?.FECHA_FIN_REPORTE ?? item.end,
               enable: enableFromApi ?? item.enable ?? false,
+              phase_enabled: phaseEnabledFromApi ?? true,
               YEAR: year,
               year,
             };

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   ReportEntryData,
+  ScheduleDateEntry,
   ScheduleDateUpdate,
   SurveyConfiguration,
   SurveyData,
@@ -35,12 +36,14 @@ export class SurveyRepository implements ISurveyRepository {
     );
   }
 
-   getScheduleDates() {
-    return lastValueFrom(
-      this._HttpClient.post(
-        `${this._apiUrlBase}api/sistema/fase`,null
-      )
+   async getScheduleDates(): Promise<ScheduleDateEntry[]> {
+    const response = await lastValueFrom(
+      this._HttpClient.post<any[]>(`${this._apiUrlBase}api/sistema/fase`, null)
     );
+
+    return Array.isArray(response)
+      ? response.map((entry) => this.normalizeScheduleDateEntry(entry))
+      : [];
   }
 
   saveConfiguration(params: SurveyConfiguration) {
@@ -127,5 +130,152 @@ export class SurveyRepository implements ISurveyRepository {
       console.error('Error al leer dataUser para obtener el número de documento', error);
       return null;
     }
+  }
+
+  private normalizeScheduleDateEntry(entry: any): ScheduleDateEntry {
+    const fechaInicioFase = entry?.FECHA_INICIO_FASE ?? entry?.FECHA_INICIO ?? null;
+    const fechaFinFase = entry?.FECHA_FIN_FASE ?? entry?.FECHA_FIN ?? null;
+    const fechaInicioReporte =
+      entry?.FECHA_INICIO_REPORTE ?? entry?.fecha_inicio_reporte ?? null;
+    const fechaFinReporte =
+      entry?.FECHA_FIN_REPORTE ?? entry?.fecha_fin_reporte ?? null;
+    const fechaInicioValidacion =
+      entry?.FECHA_INICIO_VALIDACION ?? entry?.fecha_inicio_validacion ?? null;
+    const fechaFinValidacion =
+      entry?.FECHA_FIN_VALIDACION ?? entry?.fecha_fin_validacion ?? null;
+    const esActivoFase = this.normalizeBooleanFlag(
+      entry?.ES_ACTIVO_FASE ?? entry?.ES_ACTIVO
+    );
+    const estadoRegistroReporte = this.normalizeBooleanFlag(
+      entry?.ESTADO_REGISTRO_REPORTE ?? entry?.estado_registro_reporte
+    );
+    const estadoRegistroValidacion = this.normalizeBooleanFlag(
+      entry?.ESTADO_REGISTRO_VALIDACION ?? entry?.estado_registro_validacion
+    );
+    const esActivoReporte = this.resolveProfileAvailability({
+      explicitActive: entry?.ES_ACTIVO_REPORTE,
+      globalActive: esActivoFase,
+      profileEnabled: estadoRegistroReporte,
+      startDate: fechaInicioReporte ?? fechaInicioFase,
+      endDate: fechaFinReporte ?? fechaFinFase,
+      legacyActive: entry?.ES_ACTIVO,
+    });
+    const esActivoValidacion = this.resolveProfileAvailability({
+      explicitActive: entry?.ES_ACTIVO_VALIDACION,
+      globalActive: esActivoFase,
+      profileEnabled: estadoRegistroValidacion,
+      startDate: fechaInicioValidacion,
+      endDate: fechaFinValidacion,
+      legacyActive: entry?.ES_ACTIVO_VALIDACION,
+    });
+
+    return {
+      ID_FASE: Number(entry?.ID_FASE ?? 0),
+      FASE: entry?.FASE != null ? String(entry.FASE) : null,
+      ANIO_FASE:
+        entry?.ANIO_FASE != null ? String(entry.ANIO_FASE) : null,
+      YEAR:
+        entry?.YEAR != null
+          ? String(entry.YEAR)
+          : entry?.ANIO_FASE != null
+            ? String(entry.ANIO_FASE)
+            : null,
+      FECHA_INICIO_FASE: fechaInicioFase,
+      FECHA_FIN_FASE: fechaFinFase,
+      FECHA_INICIO_REPORTE: fechaInicioReporte,
+      FECHA_FIN_REPORTE: fechaFinReporte,
+      FECHA_INICIO_VALIDACION: fechaInicioValidacion,
+      FECHA_FIN_VALIDACION: fechaFinValidacion,
+      ES_ACTIVO_FASE: esActivoFase,
+      ES_ACTIVO_REPORTE: esActivoReporte,
+      ES_ACTIVO_VALIDACION: esActivoValidacion,
+      ESTADO_REGISTRO_REPORTE: estadoRegistroReporte,
+      ESTADO_REGISTRO_VALIDACION: estadoRegistroValidacion,
+      ESTADO_REGISTRO: this.normalizeBooleanFlag(entry?.ESTADO_REGISTRO),
+    };
+  }
+
+  private resolveProfileAvailability(params: {
+    explicitActive: unknown;
+    globalActive: boolean;
+    profileEnabled: boolean;
+    startDate: string | null;
+    endDate: string | null;
+    legacyActive?: unknown;
+  }): boolean {
+    const explicitActive = this.normalizeNullableBooleanFlag(params.explicitActive);
+    if (explicitActive !== null) {
+      return explicitActive;
+    }
+
+    const hasProfileMetadata =
+      params.startDate !== null || params.endDate !== null || params.profileEnabled;
+    if (hasProfileMetadata) {
+      return (
+        params.globalActive &&
+        params.profileEnabled &&
+        this.isCurrentDateWithinRange(params.startDate, params.endDate)
+      );
+    }
+
+    return this.normalizeBooleanFlag(params.legacyActive);
+  }
+
+  private normalizeNullableBooleanFlag(value: unknown): boolean | null {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+
+    return this.normalizeBooleanFlag(value);
+  }
+
+  private isCurrentDateWithinRange(
+    startDate: string | null,
+    endDate: string | null
+  ): boolean {
+    const normalizedStart = this.normalizeDateOnly(startDate);
+    const normalizedEnd = this.normalizeDateOnly(endDate);
+
+    if (!normalizedStart || !normalizedEnd) {
+      return false;
+    }
+
+    const today = this.normalizeDateOnly(new Date().toISOString());
+    if (!today) {
+      return false;
+    }
+
+    return today >= normalizedStart && today <= normalizedEnd;
+  }
+
+  private normalizeDateOnly(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : null;
+  }
+
+  private normalizeBooleanFlag(value: unknown): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      return value === 1;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      return normalized === '1' || normalized === 'true';
+    }
+
+    return false;
   }
 }

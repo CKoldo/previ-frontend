@@ -39,7 +39,7 @@
       >
         <thead>
           <tr>
-            <th colspan="4" class="table-edit__title">
+            <th colspan="5" class="table-edit__title">
               Cronograma de fases para el año {{ selectedYear }}
             </th>
           </tr>
@@ -47,7 +47,8 @@
         <thead>
           <tr>
             <th>Fase</th>
-            <th>Estado calculado</th>
+            <th>Control de Fase</th>
+            <th>Estado por Fase</th>
             <th>Rango de fechas</th>
             <th></th>
           </tr>
@@ -65,27 +66,74 @@
                 <strong>{{ row.labelStage }}</strong>
               </div>
             </td>
+            <td>
+              <div class="table-edit__switch-stack">
+                <strong>Fase activa</strong>
+                <div class="table-edit__switch-row">
+                  <span>No</span>
+                  <p-toggleswitch
+                    [ngModel]="row.phase_enabled"
+                    (ngModelChange)="updatePhaseStatus(row, $event)"
+                    [disabled]="savingPhaseStage === row.stage"
+                  />
+                  <span>Si</span>
+                </div>
+                <small class="table-edit__status-detail">
+                  {{
+                    row.phase_enabled
+                      ? "La fase puede habilitar reporte y validación"
+                      : "La fase bloquea reporte y validación."
+                  }}
+                </small>
+              </div>
+            </td>
             <!--Estado-->
             <td>
-              <div class="table-edit__status-stack">
-                <span
-                  class="table-edit__status"
-                  [ngClass]="getStageStatusMeta(row).className"
-                >
-                  {{ getStageStatusMeta(row).label }}
-                </span>
-                <small class="table-edit__status-detail">
-                  {{ getStageStatusMeta(row).detail }}
-                </small>
+              <div class="flex mb-2 gap-2">
+                <div class="flex-1 items-center"><strong>Reporte:</strong></div>
+                <div>
+                  <span
+                    class="flex-1 items-center table-edit__status"
+                    [ngClass]="getStageStatusMeta(row).className"
+                  >
+                    {{ getStageStatusMeta(row).label }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex mb-2">
+                <div class="flex-1"><strong>Validación:</strong></div>
+                <div>
+                  <span
+                    class="flex-1 table-edit__status"
+                    [ngClass]="getStageStatusValidationMeta(row).className"
+                  >
+                    {{ getStageStatusValidationMeta(row).label }}
+                  </span>
+                </div>
               </div>
             </td>
             <!--Rango de fechas-->
             <td>
-              <div class="table-edit__stage">
-                <h2>
+              <div class="flex table-edit__stage">
+                <div class="flex-1">
+                  <h2>Reporte:</h2>
+                </div>
+                <div class="flex-1">
                   {{ formatDisplayDate(row.start) }} -
                   {{ formatDisplayDate(row.end) }}
-                </h2>
+                </div>
+              </div>
+              <div class="table-edit__stage">
+                <div>
+                  <h2>Validación:</h2>
+                </div>
+                <div>
+                  <h1>
+                    {{ formatDisplayDate(row.start_validacion) }} -
+                    {{ formatDisplayDate(row.end_validacion) }}
+                  </h1>
+                </div>
               </div>
             </td>
 
@@ -94,7 +142,10 @@
               <div class="table-edit__actions-inner">
                 <button
                   type="button"
-                  [disabled]="savingDateStage === row.stage"
+                  [disabled]="
+                    savingDateStage === row.stage ||
+                    savingPhaseStage === row.stage
+                  "
                   (click)="editRow(row)"
                   class="pi pi-calendar mr-2"
                 >
@@ -123,10 +174,10 @@
     </div>
 
     <footer class="table-edit__hint">
-      <p>
+      <!--<p>
         El estado de cada fase se calcula automaticamente segun la fecha actual
         y el rango configurado.
-      </p>
+      </p>-->
     </footer>
   </section>
 </div>
@@ -159,13 +210,31 @@
 
     <div class="table-edit__dialog-grid">
       <label class="table-edit__dialog-field">
-        <span>Fecha de inicio</span>
+        <span>Fecha de inicio de Reporte</span>
         <input type="date" [(ngModel)]="dateForm.start" name="date-start" />
       </label>
 
       <label class="table-edit__dialog-field">
-        <span>Fecha de fin</span>
+        <span>Fecha de fin de Reporte</span>
         <input type="date" [(ngModel)]="dateForm.end" name="date-end" />
+      </label>
+
+      <label class="table-edit__dialog-field">
+        <span>Fecha de inicio de Validación</span>
+        <input
+          type="date"
+          [(ngModel)]="dateForm.start_validacion"
+          name="date-start-validation"
+        />
+      </label>
+
+      <label class="table-edit__dialog-field">
+        <span>Fecha de fin de Validación</span>
+        <input
+          type="date"
+          [(ngModel)]="dateForm.end_validacion"
+          name="date-end-validation"
+        />
       </label>
     </div>
 
@@ -194,7 +263,8 @@
       </button>
       <button
         type="button"
-        class="btn ghost"
+        class="btn"
+        [class.primary]="canSaveDates"
         (click)="saveDates()"
         [disabled]="savingDateStage !== null || !canSaveDates"
       >

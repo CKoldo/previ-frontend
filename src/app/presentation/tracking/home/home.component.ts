@@ -226,7 +226,7 @@ export class HomeComponent implements OnInit {
       this.refreshVersion += 1;
 
       Swal.fire({
-        text: 'La información de tracking se actualizó correctamente.',
+        text: 'La información se actualizó correctamente.',
         icon: 'success',
         timer: 1800,
         showConfirmButton: false,

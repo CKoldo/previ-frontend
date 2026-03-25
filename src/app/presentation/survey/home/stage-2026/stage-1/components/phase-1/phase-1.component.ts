@@ -366,6 +366,11 @@ objQuestion: any = null;
 
   GoToSelectStage() {
     if (isSurveyEditMode()) {
+      if (this.router.url.includes('/tracking-user')) {
+        this._TemporalSaveService.requestClearTrackingUserSelection();
+      } else {
+        this._TemporalSaveService.requestGoBackToTracking();
+      }
       return;
     }
     this.router.navigate(['/']).then(() => {

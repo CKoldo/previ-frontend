@@ -119,8 +119,10 @@
               *ngIf="getChecks(ie, phase)"
               type="button"
               class="tracking-task-cell__edit"
-              title="Editar tarea"
-              aria-label="Editar tarea"
+              [class.tracking-task-cell__edit--disabled]="!canEditTask(phase)"
+              [disabled]="!canEditTask(phase)"
+              [title]="getEditTaskTitle(phase)"
+              [attr.aria-label]="getEditTaskTitle(phase)"
               (click)="editTaskFromCell(ie, phase)"
             >
               <i class="pi pi-pencil"></i>

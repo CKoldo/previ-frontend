@@ -1,6 +1,6 @@
 <div class="tracking-edit__container" *ngIf="hasContext; else missingContext">
   <section class="tracking-edit__card">
-    <p class="tracking-edit__eyebrow">Edición administrativa</p>
+    <p class="tracking-edit__eyebrow">Editar Reportes - UGEL | DRE</p>
     <h1 class="tracking-edit__title">{{ institutionName }}</h1>
     <p class="tracking-edit__subtitle">
       Estás editando {{ taskLabel }} del código local
@@ -29,7 +29,7 @@
         <p>{{ taskContext?.ie?.UGEL || taskContext?.ie?.DRE || "—" }}</p>
       </div>
     </div>
-
+    <!--
     <div class="tracking-edit__actions">
       <button type="button" class="btn ghost" (click)="goBack()">
         Volver al tracking
@@ -43,6 +43,7 @@
         {{ isPreparing ? "Preparando..." : "Reintentar carga" }}
       </button>
     </div>
+  -->
 
     <p class="tracking-edit__hint">
       Los cambios se guardarán directamente sobre el registro de la institución.

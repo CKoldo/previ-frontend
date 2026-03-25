@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, Type } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 import { InformationImplementationComponent } from 'app/presentation/survey/home/information-implementation/information-implementation.component';
 import { Stage1Component as Stage1Component2025 } from 'app/presentation/survey/home/stage/stage-1/stage-1.component';
@@ -85,6 +86,7 @@ export class TrackingSurveyEditComponent implements OnInit, OnDestroy {
     'dataInformationImplementation',
   ];
   private storageSnapshot = new Map<string, string | null>();
+  private goBackToTrackingSub?: Subscription;
 
   constructor(
     private router: Router,
@@ -93,6 +95,9 @@ export class TrackingSurveyEditComponent implements OnInit, OnDestroy {
   ) {
     this.temporalSaveService.init(ConfigSurvey.STAGE_PHASE_CONFIG);
     this.backupStorage();
+    this.goBackToTrackingSub = this.temporalSaveService.goBackToTracking$.subscribe(() => {
+      this.goBack();
+    });
   }
 
   ngOnInit(): void {
@@ -101,6 +106,7 @@ export class TrackingSurveyEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.goBackToTrackingSub?.unsubscribe();
     this.restoreStorage();
     disableSurveyEditMode();
   }

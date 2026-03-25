@@ -22,6 +22,10 @@ export class TemporalSaveService {
 
   private tempDataNoTarea = new BehaviorSubject<boolean>(true);
   public dataNoTarea$ = this.tempDataNoTarea.asObservable();
+  private clearTrackingUserSelectionSubject = new Subject<void>();
+  public clearTrackingUserSelection$ = this.clearTrackingUserSelectionSubject.asObservable();
+  private goBackToTrackingSubject = new Subject<void>();
+  public goBackToTracking$ = this.goBackToTrackingSubject.asObservable();
 
 
   init(initialData: any) {
@@ -119,6 +123,14 @@ export class TemporalSaveService {
   emitChangeStatusTarea(data: any) {
     console.log('[Servicio] Emitiendo cambio de estado de tarea:', data);
     this.tempDataNoTarea.next(data);
+  }
+
+  requestClearTrackingUserSelection(): void {
+    this.clearTrackingUserSelectionSubject.next();
+  }
+
+  requestGoBackToTracking(): void {
+    this.goBackToTrackingSubject.next();
   }
 
 }

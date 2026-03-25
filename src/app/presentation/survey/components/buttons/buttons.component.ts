@@ -61,10 +61,12 @@ export class ButtonsComponent {
   GoToSelectStage() {
     if (isSurveyEditMode()) {
       const currentUrl = this.router.url;
-      const destination = currentUrl.includes('/tracking-user')
-        ? ['/tracking-user']
-        : ['/tracking'];
-      this.router.navigate(destination);
+      if (currentUrl.includes('/tracking-user')) {
+        this._TemporalSaveService.requestClearTrackingUserSelection();
+        return;
+      }
+
+      this._TemporalSaveService.requestGoBackToTracking();
       return;
     }
 

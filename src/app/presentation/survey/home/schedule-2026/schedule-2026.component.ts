@@ -137,26 +137,31 @@ export class Schedule2026Component {
           enableDates: {
             start: found.start,
             end: found.end
-          }
+          },
+          phase_enabled: found.phase_enabled !== false,
         };
       }
       return {
         ...stage,
-        enableDates: {}
+        enableDates: {},
+        phase_enabled: true,
       };
     });
     const shouldForceStageOne = enableDatesArr.length === 0;
     let stages = stagesData.map((stage: any) => {
       const found = enableDatesArr.find((e: any) => e.stage == stage.stage + 5);
       if (found) {
+        const phaseEnabled = found.phase_enabled !== false;
         return {
           ...stage,
-          enable: found.enable
+          enable: phaseEnabled ? found.enable : false,
+          phase_enabled: phaseEnabled,
         };
       }
       return {
         ...stage,
-        enable: shouldForceStageOne ? stage.stage === 1 : false
+        enable: shouldForceStageOne ? stage.stage === 1 : false,
+        phase_enabled: true,
       };
     });
     this.stages = Array.from(stages);

@@ -28,3 +28,11 @@
 	outline: 2px solid #94a3b8;
 	outline-offset: 2px;
 }
+
+.tracking-task-cell__edit--disabled,
+.tracking-task-cell__edit:disabled {
+	cursor: not-allowed;
+	opacity: 0.45;
+	background: transparent;
+	color: #94a3b8;
+}

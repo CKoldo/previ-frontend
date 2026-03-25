@@ -121,15 +121,18 @@ export class ScheduleComponent {
 
       const found = enableDates.find((e: any) => e.stage == stage.stage);
       if (found) {
+        const phaseEnabled = found.phase_enabled !== false;
 
         return {
           ...stage,
-          enable:found.enable
+          enable: phaseEnabled ? found.enable : false,
+          phase_enabled: phaseEnabled,
         };
       }
       return {
         ...stage,
-        enable: false
+        enable: false,
+        phase_enabled: true,
       };
     });
     this.stages = Array.from(stages);

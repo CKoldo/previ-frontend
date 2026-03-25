@@ -16,7 +16,12 @@ import { ListboxModule } from 'primeng/listbox';
 import { Router } from '@angular/router';
 import { GetPhaseFilesHandler } from 'app/application/tracking-user/get-phase-files/get-phase-files.handler';
 import { GetPhaseFilesQuery } from 'app/application/tracking-user/get-phase-files/get-phase-files.query';
+import { GetScheduleDatesHandler } from 'app/application/survey/get-schedule-dates/get-schedule-dates.handler';
+import { GetScheduleDatesQuery } from 'app/application/survey/get-schedule-dates/get-schedule-dates.query';
+import { ScheduleDateEntry } from 'app/domain/survey/survey.model';
+import { ISurveyRepository } from 'app/domain/survey/survey.repository';
 import { ITrackingUserRepository } from 'app/domain/tracking-user/tracking-user.repository';
+import { SurveyRepository } from 'app/infrastructure/repositories/survey.repository';
 import { TrackingUserRepository } from 'app/infrastructure/repositories/tracking-user.repository';
 import Swal from 'sweetalert2';
 import JSZip from 'jszip';
@@ -35,6 +40,8 @@ import { ScheduleYear } from 'app/shared/utils/stage-storage.util';
     ListboxModule
   ],
   providers: [
+    { provide: ISurveyRepository, useClass: SurveyRepository },
+    { provide: GetScheduleDatesQuery, useClass: GetScheduleDatesHandler },
     { provide: ITrackingUserRepository, useClass: TrackingUserRepository },
     { provide: GetPhaseFilesQuery, useClass: GetPhaseFilesHandler },
   ],
@@ -54,10 +61,12 @@ export class TableCheckerComponent implements OnInit, OnChanges {
   stagesWithPhases: { stage: number; phases: number[]; displayStage: number }[] = [];
   selectedPhasesByStage: { [stage: number]: number[] } = {};
   arrayArchivos: any[] = [];
+  validationEnabledStages = new Set<number>();
 
   selectIE: any = null;
 
   constructor(
+    private _getScheduleDatesQuery: GetScheduleDatesQuery,
     private _getPhaseFilesQuery: GetPhaseFilesQuery,
     private _router: Router,
   ) {
@@ -74,6 +83,7 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     this.buildStructureTable();
     this.phaseHeaders = this.getPhaseHeaders();
     this.syncTableData();
+    void this.loadValidationAvailability();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -81,11 +91,13 @@ export class TableCheckerComponent implements OnInit, OnChanges {
       this.buildStructureTable();
       this.phaseHeaders = this.getPhaseHeaders();
       this.syncTableData();
+      void this.loadValidationAvailability();
       return;
     }
 
     if (changes['refreshToken'] && !changes['refreshToken'].firstChange) {
       this.syncTableData();
+      void this.loadValidationAvailability();
       return;
     }
 
@@ -239,6 +251,18 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     return ie.checks.some(
       (item: any) => item.idPhase === phase.idPhase && item.value == 1,
     );
+  }
+
+  canEditTask(phase: any): boolean {
+    return this.validationEnabledStages.has(Number(phase?.idStage));
+  }
+
+  getEditTaskTitle(phase: any): string {
+    if (this.canEditTask(phase)) {
+      return 'Editar tarea';
+    }
+
+    return 'La edición solo está disponible durante la validación.';
   }
 
   editTaskFromCell(ie: any, phase: any): void {
@@ -579,5 +603,51 @@ export class TableCheckerComponent implements OnInit, OnChanges {
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .trim();
+  }
+
+  private async loadValidationAvailability(): Promise<void> {
+    try {
+      const scheduleDates = await this._getScheduleDatesQuery.execute();
+      const enabledStages = scheduleDates
+        .filter((entry) => this.matchesScheduleYear(entry))
+        .filter((entry) => this.isFlagEnabled(entry?.ES_ACTIVO_VALIDACION))
+        .map((entry) => Number(entry.ID_FASE))
+        .filter((stage) => Number.isFinite(stage));
+
+      this.validationEnabledStages = new Set<number>(enabledStages);
+    } catch (error) {
+      console.warn(
+        'No se pudo obtener la disponibilidad de validación para editar tareas.',
+        error,
+      );
+      this.validationEnabledStages = new Set<number>();
+    }
+  }
+
+  private matchesScheduleYear(entry: ScheduleDateEntry): boolean {
+    const entryYear = String(entry?.YEAR ?? '').trim();
+
+    if (!entryYear) {
+      return true;
+    }
+
+    return entryYear === this.scheduleYear;
+  }
+
+  private isFlagEnabled(value: boolean | number | string | null | undefined): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      return value === 1;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      return normalized === '1' || normalized === 'true';
+    }
+
+    return false;
   }
 }

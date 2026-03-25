@@ -74,6 +74,7 @@ interface YearOption {
 export class SurveyEditComponent implements OnDestroy {
   form: FormGroup;
   private stageChangeSub?: Subscription;
+  private clearSelectionSub?: Subscription;
 
   stageOptions: StageOption[] = ConfigSurvey.SCHEDULE_CONFIG.map(
     (stageConfig: { labelStage: string; stage: number }) => ({
@@ -141,10 +142,15 @@ export class SurveyEditComponent implements OnDestroy {
     this.initStageWatcher();
     this.backupStorage();
     this.temporalSaveService.init(ConfigSurvey.STAGE_PHASE_CONFIG);
+    this.clearSelectionSub = this.temporalSaveService.clearTrackingUserSelection$.subscribe(() => {
+      this.clearSelection();
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {
     this.stageChangeSub?.unsubscribe();
+    this.clearSelectionSub?.unsubscribe();
     this.restoreStorage();
     disableSurveyEditMode();
   }
