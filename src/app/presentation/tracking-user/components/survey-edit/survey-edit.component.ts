@@ -223,11 +223,11 @@ export class SurveyEditComponent implements OnDestroy {
         return;
       }
 
+      setActiveStageYear(scheduleYear);
       this.persistContext(numeroDocumento, codigoLocal, scheduleYear);
       this.setStageConfig(scheduleYear);
       this.setCurrentSurvey(stage, task);
       this.persistBackendStageContext(stage, backendStage, scheduleYear);
-      setActiveStageYear(scheduleYear);
       enableSurveyEditMode();
 
       this.selectedStage = stage;
