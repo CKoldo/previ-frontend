@@ -91,13 +91,13 @@ export class HomeComponent {
       {
         year: '2025',
         title: 'Implementacion 2025',
-        description: 'Plan de implementación vigente',
+        description: 'Plan de implementación del año anterior',
         icon: 'pi-calendar',
       },
       {
         year: '2026',
         title: 'Implementacion 2026',
-        description: 'Plan piloto del próximo año',
+        description: 'Plan de implementación del presente año',
         icon: 'pi-calendar',
       },
     ];
