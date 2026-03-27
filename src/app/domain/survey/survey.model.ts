@@ -12,6 +12,7 @@ export interface SurveyData {
   FECHA_IMPLEMENTACION?: string;
   REGISTRA_TAREA?: boolean;
   YEAR?: string;
+  ID_PADRON_ANIO?: number;
 }
 
 export interface SurveyConfiguration {

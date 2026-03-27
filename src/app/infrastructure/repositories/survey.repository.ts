@@ -11,6 +11,7 @@ import {
 import { ISurveyRepository } from 'app/domain/survey/survey.repository';
 import { environment } from 'environments/environment';
 import { lastValueFrom } from 'rxjs';
+import { convertYearToIdPadronAnio, convertIdPadronAnioToYear } from 'app/shared/utils/year-id-mapper.util';
 
 @Injectable()
 export class SurveyRepository implements ISurveyRepository {
@@ -25,7 +26,14 @@ export class SurveyRepository implements ISurveyRepository {
 
     for (const key in params) {
       if (params.hasOwnProperty(key)) {
-        formData.append(key, (params as Record<string, any>)[key]);
+        const value = (params as Record<string, any>)[key];
+        
+        // Convertir YEAR a ID_PADRON_ANIO
+        if (key === 'YEAR' && value) {
+          formData.append('ID_PADRON_ANIO', String(convertYearToIdPadronAnio(value)));
+        } else if (key !== 'YEAR') {
+          formData.append(key, value);
+        }
       }
     }
     return lastValueFrom(
@@ -36,7 +44,7 @@ export class SurveyRepository implements ISurveyRepository {
     );
   }
 
-   async getScheduleDates(): Promise<ScheduleDateEntry[]> {
+  async getScheduleDates(): Promise<ScheduleDateEntry[]> {
     const response = await lastValueFrom(
       this._HttpClient.post<any[]>(`${this._apiUrlBase}api/sistema/fase`, null)
     );
@@ -69,7 +77,14 @@ export class SurveyRepository implements ISurveyRepository {
 
     for (const key in params) {
       if (params.hasOwnProperty(key)) {
-        formData.append(key, (params as Record<string, any>)[key]);
+        const value = (params as Record<string, any>)[key];
+        
+        // Convertir YEAR a ID_PADRON_ANIO
+        if (key === 'YEAR' && value) {
+          formData.append('ID_PADRON_ANIO', String(convertYearToIdPadronAnio(value)));
+        } else if (key !== 'YEAR') {
+          formData.append(key, value);
+        }
       }
     }
     return lastValueFrom(
@@ -175,11 +190,13 @@ export class SurveyRepository implements ISurveyRepository {
       ANIO_FASE:
         entry?.ANIO_FASE != null ? String(entry.ANIO_FASE) : null,
       YEAR:
-        entry?.YEAR != null
-          ? String(entry.YEAR)
-          : entry?.ANIO_FASE != null
-            ? String(entry.ANIO_FASE)
-            : null,
+        entry?.ID_PADRON_ANIO != null
+          ? convertIdPadronAnioToYear(entry.ID_PADRON_ANIO)
+          : entry?.YEAR != null
+            ? String(entry.YEAR)
+            : entry?.ANIO_FASE != null
+              ? String(entry.ANIO_FASE)
+              : null,
       FECHA_INICIO_FASE: fechaInicioFase,
       FECHA_FIN_FASE: fechaFinFase,
       FECHA_INICIO_REPORTE: fechaInicioReporte,
