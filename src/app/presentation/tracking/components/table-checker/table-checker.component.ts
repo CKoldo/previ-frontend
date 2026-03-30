@@ -341,6 +341,7 @@ export class TableCheckerComponent implements OnInit, OnChanges {
     let filesAdded = 0;
     for (const stageStr in this.selectedPhasesByStage) {
       const stage = Number(stageStr);
+      const displayStage = this.getDisplayStageNumber(stage);
       const phases: number[] = this.selectedPhasesByStage[stage];
       for (const phase of phases) {
         // Busca el archivo correspondiente en arrayArchivos
@@ -355,7 +356,7 @@ export class TableCheckerComponent implements OnInit, OnChanges {
             archivo.EXTENSION_ACTA,
           );
           zip.file(
-            `fase_${stage}_tarea_${phase}_acta.${archivo.EXTENSION_ACTA}`,
+            `fase_${displayStage}_tarea_${phase}_acta.${archivo.EXTENSION_ACTA}`,
             actaBlob,
           );
           filesAdded++;
@@ -367,7 +368,7 @@ export class TableCheckerComponent implements OnInit, OnChanges {
             archivo.EXTENSION_EVIDENCIA,
           );
           zip.file(
-            `fase_${stage}_tarea_${phase}_evidencia.${archivo.EXTENSION_EVIDENCIA}`,
+            `fase_${displayStage}_tarea_${phase}_evidencia.${archivo.EXTENSION_EVIDENCIA}`,
             evidenciaBlob,
           );
           filesAdded++;
